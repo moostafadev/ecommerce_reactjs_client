@@ -1,21 +1,18 @@
 export interface IImage {
-  data: {
-    attributes: {
-      url: string;
-      alternativeText: string;
-    };
+  attributes: {
+    url: string;
+    alternativeText: string;
   };
 }
 
 export interface ICategories {
-  data: {
-    attributes: {
-      title: string;
-    };
+  id: number;
+  attributes: {
+    title: string;
   };
 }
 
-export interface IProduct {
+export interface IProducts {
   id: string;
   attributes: {
     brand: string;
@@ -25,8 +22,42 @@ export interface IProduct {
     rating: number;
     stock: number;
     title: string;
-    categories: ICategories[];
-    images: IImage[];
+  };
+}
+
+export interface ICategory {
+  id: number;
+  attributes: {
+    title: string;
+    categories: {
+      data: ICategories[];
+    };
+    thumbnail: {
+      data: IImage;
+    };
+    products: {
+      data: IProducts[];
+    };
+  };
+}
+
+export interface IProduct {
+  id: number;
+  category: ICategory;
+  attributes: {
+    brand: string;
+    description: string;
+    discountPercentage: number;
+    price: number;
+    rating: number;
+    stock: number;
+    title: string;
+    categories: {
+      data: ICategories[];
+    };
+    images: {
+      data: IImage[];
+    };
     thumbnail: IImage;
   };
 }
