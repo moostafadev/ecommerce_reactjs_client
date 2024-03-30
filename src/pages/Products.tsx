@@ -31,7 +31,7 @@ function ProductsPage() {
   if (isLoading)
     return (
       <Grid
-        margin={30}
+        marginY={30}
         templateColumns={"repeat(auto-fill, minmax(300px, 1fr))"}
         gap={"3"}
       >
@@ -44,7 +44,7 @@ function ProductsPage() {
 
   return (
     <Grid
-      margin={30}
+      marginY={30}
       templateColumns={"repeat(auto-fill, minmax(300px, 1fr))"}
       gap={"3"}
     >

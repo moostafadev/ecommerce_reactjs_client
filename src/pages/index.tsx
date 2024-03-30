@@ -1,5 +1,12 @@
+import { Box } from "@chakra-ui/react";
+import HeroSection from "../layout/HeroSection";
+
 const HomePage = () => {
-  return <div>Home Page</div>;
+  return (
+    <Box>
+      <HeroSection />
+    </Box>
+  );
 };
 
 export default HomePage;

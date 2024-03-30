@@ -58,6 +58,8 @@ export interface IProduct {
     images: {
       data: IImage[];
     };
-    thumbnail: IImage;
+    thumbnail: {
+      data: IImage;
+    };
   };
 }
