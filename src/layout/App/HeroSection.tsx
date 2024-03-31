@@ -1,14 +1,21 @@
 import { Box, Heading, Container, Text, Button, Stack } from "@chakra-ui/react";
+import { MAX_WIDTH_CONTAINER } from "../../common/varables";
 
 const HeroSection = () => {
   return (
-    <>
-      <Container maxW={"4xl"} h={`calc(100vh - 64px)`}>
+    <Box px={"16px"}>
+      <Container
+        maxW={MAX_WIDTH_CONTAINER}
+        h={`calc(100vh - 64px)`}
+        position={"relative"}
+      >
         <Stack
           as={Box}
           textAlign={"center"}
           spacing={{ base: 8, md: 14 }}
-          py={{ base: 32, md: 28 }}
+          position={"absolute"}
+          inset={0}
+          justifyContent={"center"}
         >
           <Heading
             fontWeight={600}
@@ -34,6 +41,8 @@ const HeroSection = () => {
             position={"relative"}
           >
             <Button
+              as={"a"}
+              href={"#features"}
               colorScheme={"green"}
               bg={"green.400"}
               rounded={"full"}
@@ -50,7 +59,7 @@ const HeroSection = () => {
           </Stack>
         </Stack>
       </Container>
-    </>
+    </Box>
   );
 };
 

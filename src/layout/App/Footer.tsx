@@ -11,6 +11,7 @@ import {
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { MAX_WIDTH_CONTAINER } from "../../common/varables";
 
 const SocialButton = ({
   children,
@@ -53,7 +54,7 @@ const Footer = () => {
     >
       <Container
         as={Stack}
-        maxW={"4xl"}
+        maxW={MAX_WIDTH_CONTAINER}
         py={4}
         direction={{ base: "column", sm: "row" }}
         spacing={4}

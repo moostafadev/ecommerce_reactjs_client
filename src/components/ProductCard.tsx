@@ -12,7 +12,7 @@ import { IProduct } from "../interfaces";
 
 const ProductCard = ({ id, attributes, category }: IProduct) => {
   return (
-    <Card>
+    <Card maxW={"100%"}>
       <CardBody display={"flex"} flexDirection={"column"}>
         <Image
           src={attributes?.thumbnail?.data?.attributes?.url}

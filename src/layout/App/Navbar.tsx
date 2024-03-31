@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
+import { MAX_WIDTH_CONTAINER } from "../../common/varables";
 
 interface Props {
   children: React.ReactNode;
@@ -63,7 +64,7 @@ const Navbar = () => {
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")}>
-        <Container maxW={"4xl"}>
+        <Container maxW={MAX_WIDTH_CONTAINER}>
           <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
             <HStack spacing={{ lg: 8, base: 2 }} alignItems={"center"}>
               <IconButton

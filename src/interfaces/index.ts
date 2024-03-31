@@ -9,6 +9,7 @@ export interface ICategories {
   id: number;
   attributes: {
     title: string;
+    description: string;
   };
 }
 
@@ -29,6 +30,7 @@ export interface ICategory {
   id: number;
   attributes: {
     title: string;
+    description: string;
     categories: {
       data: ICategories[];
     };
