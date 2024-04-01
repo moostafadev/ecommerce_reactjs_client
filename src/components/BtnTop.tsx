@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { MdOutlineKeyboardDoubleArrowUp } from "react-icons/md";
 
 const BtnTop = () => {
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(-100);
 
   useEffect(() => {
     const handleScroll = () => {

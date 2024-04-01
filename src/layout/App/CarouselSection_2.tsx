@@ -7,7 +7,6 @@ import {
   Stack,
   Text,
   useBreakpointValue,
-  useColorMode,
 } from "@chakra-ui/react";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import Slider from "react-slick";
@@ -29,36 +28,31 @@ const settings = {
   slidesToScroll: 1,
 };
 
-const CarouselSection = () => {
-  const colorMode = useColorMode();
+const CarouselSection_2 = () => {
   const [slider, setSlider] = React.useState<Slider | null>(null);
 
   const top = useBreakpointValue({ base: "90%", md: "50%" });
   const side = useBreakpointValue({ base: "30%", md: "40px" });
 
-  const getCategories = async () => {
+  const getProducts = async () => {
     const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/categories?populate=*`
+      `${import.meta.env.VITE_SERVER_URL}/api/products?populate=*`
     );
     return res;
   };
-  const {
-    data: categoriesData,
-    isLoading,
-    isFetching,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
   });
 
-  const cardData = categoriesData?.data?.data?.map((category: ICategory) => {
-    return {
-      id: category?.id,
-      title: category?.attributes?.title,
-      description: category?.attributes?.description,
-      image: category?.attributes?.thumbnail?.data?.attributes?.url,
-    };
-  });
+  const cardData = Array.isArray(data?.data?.data)
+    ? data?.data?.data?.map((category: ICategory) => ({
+        id: category.id,
+        title: category.attributes?.title,
+        description: category.attributes?.description,
+        image: category.attributes?.thumbnail?.data?.attributes?.url,
+      }))
+    : null;
 
   if (isLoading || isFetching)
     return (
@@ -74,17 +68,12 @@ const CarouselSection = () => {
         <CardSectionSkeleton />
       </Container>
     );
+
   return (
-    <Box
-      position={"relative"}
-      width={"full"}
-      overflow={"hidden"}
-      py={"60px"}
-      bg={colorMode.colorMode === "light" ? "green.300" : "green.500"}
-    >
+    <Box position={"relative"} width={"full"} overflow={"hidden"} py={"60px"}>
       <Stack spacing={"5px"} align={"center"} mb={"30px"}>
-        <Heading>Our Categories</Heading>
-        <Text>We offer a diverse range of products and services</Text>
+        <Heading>Our Products</Heading>
+        <Text>Explore our wide selection of products and services</Text>
       </Stack>
       <link
         rel="stylesheet"
@@ -132,20 +121,20 @@ const CarouselSection = () => {
             index: number
           ) => (
             <Container
+              key={index}
               maxW={"100%"}
               height={"100%"}
               mx={"auto"}
               display={"flax"}
               alignItems={"center"}
               mb={{ base: "60px", md: "20px" }}
-              key={index}
             >
               <CardSection
                 id={data.id}
                 description={data.description}
                 image={data.image}
                 title={data.title}
-                type="category"
+                type="product"
               />
             </Container>
           )
@@ -155,4 +144,4 @@ const CarouselSection = () => {
   );
 };
 
-export default CarouselSection;
+export default CarouselSection_2;

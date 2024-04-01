@@ -36,6 +36,10 @@ const Links = [
     name: "Products",
     linkTo: "products",
   },
+  {
+    name: "Categories",
+    linkTo: "categories",
+  },
 ];
 
 const NavLink = (props: Props) => {
