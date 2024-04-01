@@ -27,6 +27,7 @@ export interface IProducts {
 }
 
 export interface ICategory {
+  typeData?: "product" | "category";
   id: number;
   attributes: {
     title: string;
@@ -37,27 +38,28 @@ export interface ICategory {
     thumbnail: {
       data: IImage;
     };
-    products: {
+    products?: {
       data: IProducts[];
     };
   };
 }
 
 export interface IProduct {
+  typeData?: "product" | "category";
   id: number;
-  category: ICategory;
+  category?: ICategory;
   attributes: {
-    brand: string;
+    brand?: string;
     description: string;
-    discountPercentage: number;
-    price: number;
-    rating: number;
-    stock: number;
+    discountPercentage?: number;
+    price?: number;
+    rating?: number;
+    stock?: number;
     title: string;
     categories: {
       data: ICategories[];
     };
-    images: {
+    images?: {
       data: IImage[];
     };
     thumbnail: {

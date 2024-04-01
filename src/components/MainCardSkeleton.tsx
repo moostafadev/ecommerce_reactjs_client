@@ -1,6 +1,6 @@
 import { Box, Skeleton, SkeletonText, useColorMode } from "@chakra-ui/react";
 
-const ProductSkeleton = () => {
+const MainCardSkeleton = () => {
   const { colorMode } = useColorMode();
 
   return (
@@ -21,4 +21,4 @@ const ProductSkeleton = () => {
   );
 };
 
-export default ProductSkeleton;
+export default MainCardSkeleton;

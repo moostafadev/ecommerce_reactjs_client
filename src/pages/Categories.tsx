@@ -2,9 +2,9 @@ import { Container, Grid } from "@chakra-ui/react";
 import axios from "axios";
 import { ICategory } from "../interfaces";
 import { useQuery } from "@tanstack/react-query";
-import ProductSkeleton from "../components/ProductCardSkeleton";
 import { MAX_WIDTH_CONTAINER } from "../common/varables";
-import CategoryCard from "../components/CategoryCard";
+import MainCard from "../components/MainCard";
+import MainCardSkeleton from "../components/MainCardSkeleton";
 
 const CategoriesPage = () => {
   const getCategories = async () => {
@@ -32,7 +32,7 @@ const CategoriesPage = () => {
           gap={"3"}
         >
           {Array.from({ length: 10 }, (_, index) => (
-            <ProductSkeleton key={index} />
+            <MainCardSkeleton key={index} />
           ))}
         </Grid>
       </Container>
@@ -47,10 +47,11 @@ const CategoriesPage = () => {
         gap={"3"}
       >
         {categoriesData?.data?.data.map((category: ICategory) => (
-          <CategoryCard
+          <MainCard
             key={category.id}
             id={category.id}
             attributes={category.attributes}
+            typeData="category"
           />
         ))}
       </Grid>

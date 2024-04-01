@@ -1,10 +1,10 @@
 import { Container, Grid } from "@chakra-ui/react";
-import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import { IProduct } from "../interfaces";
 import { useQuery } from "@tanstack/react-query";
-import ProductSkeleton from "../components/ProductCardSkeleton";
 import { MAX_WIDTH_CONTAINER } from "../common/varables";
+import MainCard from "../components/MainCard";
+import MainCardSkeleton from "../components/MainCardSkeleton";
 
 const ProductsPage = () => {
   const getProducts = async () => {
@@ -38,7 +38,7 @@ const ProductsPage = () => {
           gap={"3"}
         >
           {Array.from({ length: 10 }, (_, index) => (
-            <ProductSkeleton key={index} />
+            <MainCardSkeleton key={index} />
           ))}
         </Grid>
       </Container>
@@ -54,7 +54,7 @@ const ProductsPage = () => {
       >
         {Array.isArray(data?.data?.data) &&
           data.data.data.map((product: IProduct) => (
-            <ProductCard
+            <MainCard
               key={product.id}
               id={product.id}
               attributes={product.attributes}
@@ -64,6 +64,7 @@ const ProductsPage = () => {
                     category.id === product.attributes.categories.data[0].id
                 )[0]
               }
+              typeData="product"
             />
           ))}
       </Grid>

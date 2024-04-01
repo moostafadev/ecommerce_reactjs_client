@@ -13,7 +13,7 @@ import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import Slider from "react-slick";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { ICategory } from "../../interfaces";
+import { ICategory, IProduct } from "../../interfaces";
 import CardSection from "../../components/CardSection";
 import CardSectionSkeleton from "../../components/CardSectionSkeleton";
 
@@ -29,36 +29,38 @@ const settings = {
   slidesToScroll: 1,
 };
 
-const CarouselSection = () => {
+const CarouselSection = ({
+  typeData,
+}: {
+  typeData: "product" | "category";
+}) => {
   const colorMode = useColorMode();
   const [slider, setSlider] = React.useState<Slider | null>(null);
 
   const top = useBreakpointValue({ base: "90%", md: "50%" });
   const side = useBreakpointValue({ base: "30%", md: "40px" });
 
-  const getCategories = async () => {
+  const getData = async () => {
     const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/categories?populate=*`
+      `${import.meta.env.VITE_SERVER_URL}/api/${
+        typeData === "product" ? "products" : "categories"
+      }?populate=*`
     );
     return res;
   };
-  const {
-    data: categoriesData,
-    isLoading,
-    isFetching,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: typeData === "product" ? ["products"] : ["categories"],
+    queryFn: getData,
   });
 
-  const cardData = categoriesData?.data?.data?.map((category: ICategory) => {
-    return {
-      id: category?.id,
-      title: category?.attributes?.title,
-      description: category?.attributes?.description,
-      image: category?.attributes?.thumbnail?.data?.attributes?.url,
-    };
-  });
+  const cardData = Array.isArray(data?.data?.data)
+    ? data?.data?.data?.map((item: ICategory | IProduct) => ({
+        id: item.id,
+        title: item.attributes?.title,
+        description: item.attributes?.description,
+        image: item.attributes?.thumbnail?.data?.attributes?.url,
+      }))
+    : null;
 
   if (isLoading || isFetching)
     return (
@@ -80,11 +82,23 @@ const CarouselSection = () => {
       width={"full"}
       overflow={"hidden"}
       py={"60px"}
-      bg={colorMode.colorMode === "light" ? "green.300" : "green.500"}
+      bg={
+        typeData === "category"
+          ? colorMode.colorMode === "light"
+            ? "green.300"
+            : "green.500"
+          : undefined
+      }
     >
       <Stack spacing={"5px"} align={"center"} mb={"30px"}>
-        <Heading>Our Categories</Heading>
-        <Text>We offer a diverse range of products and services</Text>
+        <Heading>
+          Our {typeData === "product" ? "Products" : "Categories"}
+        </Heading>
+        <Text>
+          {typeData === "product"
+            ? "Explore our wide selection of products and services"
+            : "We offer a diverse range of products and services"}
+        </Text>
       </Stack>
       <link
         rel="stylesheet"
@@ -145,7 +159,7 @@ const CarouselSection = () => {
                 description={data.description}
                 image={data.image}
                 title={data.title}
-                type="category"
+                type={typeData === "product" ? "product" : "category"}
               />
             </Container>
           )
