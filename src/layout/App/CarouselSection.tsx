@@ -34,7 +34,7 @@ const CarouselSection = ({
 }: {
   typeData: "product" | "category";
 }) => {
-  const colorMode = useColorMode();
+  const { colorMode } = useColorMode();
   const [slider, setSlider] = React.useState<Slider | null>(null);
 
   const top = useBreakpointValue({ base: "90%", md: "50%" });
@@ -84,7 +84,7 @@ const CarouselSection = ({
       py={"60px"}
       bg={
         typeData === "category"
-          ? colorMode.colorMode === "light"
+          ? colorMode === "light"
             ? "green.300"
             : "green.500"
           : undefined
@@ -94,7 +94,7 @@ const CarouselSection = ({
         <Heading>
           Our {typeData === "product" ? "Products" : "Categories"}
         </Heading>
-        <Text>
+        <Text textAlign={"center"}>
           {typeData === "product"
             ? "Explore our wide selection of products and services"
             : "We offer a diverse range of products and services"}
@@ -119,6 +119,7 @@ const CarouselSection = ({
         transform={"translate(0%, -50%)"}
         zIndex={2}
         onClick={() => slider?.slickPrev()}
+        bg={colorMode === "dark" ? "gray.800" : "white"}
       >
         <BiLeftArrowAlt size="40px" />
       </IconButton>
@@ -131,6 +132,7 @@ const CarouselSection = ({
         transform={"translate(0%, -50%)"}
         zIndex={2}
         onClick={() => slider?.slickNext()}
+        bg={colorMode === "dark" ? "gray.800" : "white"}
       >
         <BiRightArrowAlt size="40px" />
       </IconButton>

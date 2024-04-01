@@ -26,6 +26,7 @@ import axios from "axios";
 import { IProduct } from "../interfaces";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import React from "react";
+import ProductPageSkeleton from "../components/ProductPageSkeleton";
 
 const settings = {
   dots: true,
@@ -53,28 +54,32 @@ const ProductPage = () => {
     );
     return res;
   };
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["products"],
     queryFn: getProduct,
   });
   const product: IProduct = data?.data?.data;
-  if (isLoading) return;
 
+  if (isLoading || isFetching)
+    return (
+      <Container
+        maxW={MAX_WIDTH_CONTAINER}
+        py={"30px"}
+        minH={"calc(100vh - 64px)"}
+      >
+        <ProductPageSkeleton />
+      </Container>
+    );
   return (
     <Box>
       <Container maxW={MAX_WIDTH_CONTAINER}>
         <SimpleGrid
           columns={{ base: 1, lg: 2 }}
           spacing={{ base: 8, md: 10 }}
-          py={{ base: 18, md: 24 }}
+          py={{ base: 18, md: "30px" }}
         >
           <Flex flexDir={"column"}>
-            <Box
-              position={"relative"}
-              width={"full"}
-              overflow={"hidden"}
-              py={"40px"}
-            >
+            <Box position={"relative"} width={"full"} overflow={"hidden"}>
               <link
                 rel="stylesheet"
                 type="text/css"
@@ -94,6 +99,7 @@ const ProductPage = () => {
                 transform={"translate(0%, -50%)"}
                 zIndex={2}
                 onClick={() => slider?.slickPrev()}
+                bg={colorMode === "dark" ? "gray.800" : "white"}
               >
                 <BiLeftArrowAlt size="40px" />
               </IconButton>
@@ -106,12 +112,18 @@ const ProductPage = () => {
                 transform={"translate(0%, -50%)"}
                 zIndex={2}
                 onClick={() => slider?.slickNext()}
+                bg={colorMode === "dark" ? "gray.800" : "white"}
               >
                 <BiRightArrowAlt size="40px" />
               </IconButton>
               <Slider {...settings} ref={(slider) => setSlider(slider)}>
                 {product?.attributes?.images?.data?.map((image, idx) => (
-                  <Stack h={"500px"} key={idx} position={"relative"}>
+                  <Stack
+                    h={"500px"}
+                    key={idx}
+                    position={"relative"}
+                    mb={"20px"}
+                  >
                     <Image
                       alt={image.attributes.alternativeText}
                       src={image.attributes.url}
@@ -131,7 +143,6 @@ const ProductPage = () => {
               gridTemplateColumns={`repeat(auto-fill, minmax(120px, 1fr))`}
               gap={"10px"}
               h={"fit-content"}
-              mt={"10px"}
             >
               {product?.attributes?.images?.data?.map((image, idx) => (
                 <Image
@@ -164,8 +175,10 @@ const ProductPage = () => {
               <Stack flexDirection={"row"} gap={"16px"}>
                 <Text fontWeight={300} fontSize={"2xl"}>
                   $
-                  {product?.attributes?.price -
-                    product?.attributes?.discountPercentage}{" "}
+                  {product?.attributes?.price &&
+                    product?.attributes?.discountPercentage &&
+                    product?.attributes?.price -
+                      product?.attributes?.discountPercentage}{" "}
                   USD
                 </Text>
                 <Text
@@ -218,53 +231,28 @@ const ProductPage = () => {
                 <List spacing={2}>
                   <ListItem>
                     <Text as={"span"} fontWeight={"bold"}>
-                      Between lugs:
+                      Stock:
                     </Text>{" "}
-                    20 mm
+                    {product.attributes.stock}
                   </ListItem>
                   <ListItem>
                     <Text as={"span"} fontWeight={"bold"}>
-                      Bracelet:
+                      Rating:
                     </Text>{" "}
-                    leather strap
+                    {product.attributes.rating}
                   </ListItem>
                   <ListItem>
                     <Text as={"span"} fontWeight={"bold"}>
-                      Case:
+                      Brand:
                     </Text>{" "}
-                    Steel
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Case diameter:
-                    </Text>{" "}
-                    42 mm
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Dial color:
-                    </Text>{" "}
-                    Black
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Crystal:
-                    </Text>{" "}
-                    Domed, scratch‑resistant sapphire crystal with
-                    anti‑reflective treatment inside
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Water resistance:
-                    </Text>{" "}
-                    5 bar (50 metres / 167 feet){" "}
+                    {product.attributes.brand}
                   </ListItem>
                 </List>
               </Box>
             </Stack>
 
             <Button
-              rounded={"none"}
+              rounded={"lg"}
               w={"full"}
               mt={8}
               size={"lg"}
