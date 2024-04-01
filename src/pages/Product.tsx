@@ -70,6 +70,7 @@ const ProductPage = () => {
         <ProductPageSkeleton />
       </Container>
     );
+
   return (
     <Box>
       <Container maxW={MAX_WIDTH_CONTAINER}>
@@ -117,16 +118,34 @@ const ProductPage = () => {
                 <BiRightArrowAlt size="40px" />
               </IconButton>
               <Slider {...settings} ref={(slider) => setSlider(slider)}>
-                {product?.attributes?.images?.data?.map((image, idx) => (
-                  <Stack
-                    h={"500px"}
-                    key={idx}
-                    position={"relative"}
-                    mb={"20px"}
-                  >
+                {product?.attributes?.images?.data ? (
+                  product?.attributes?.images?.data?.map((image, idx) => (
+                    <Stack
+                      h={"500px"}
+                      key={idx}
+                      position={"relative"}
+                      mb={"20px"}
+                    >
+                      <Image
+                        alt={image.attributes.alternativeText}
+                        src={image.attributes.url}
+                        height={"100%"}
+                        rounded={"lg"}
+                        mx={"auto"}
+                        position={"absolute"}
+                        inset={0}
+                        h={"100%"}
+                        w={"100%"}
+                      />
+                    </Stack>
+                  ))
+                ) : (
+                  <Stack h={"500px"} position={"relative"} mb={"20px"}>
                     <Image
-                      alt={image.attributes.alternativeText}
-                      src={image.attributes.url}
+                      alt={"NoProduct"}
+                      src={
+                        "https://res.cloudinary.com/dvtmqtcyl/image/upload/v1712000980/No_Products_55d29f8b32.jpg"
+                      }
                       height={"100%"}
                       rounded={"lg"}
                       mx={"auto"}
@@ -136,7 +155,7 @@ const ProductPage = () => {
                       w={"100%"}
                     />
                   </Stack>
-                ))}
+                )}
               </Slider>
             </Box>
             <Grid
@@ -176,19 +195,28 @@ const ProductPage = () => {
                 <Text fontWeight={300} fontSize={"2xl"}>
                   $
                   {product?.attributes?.price &&
-                    product?.attributes?.discountPercentage &&
-                    product?.attributes?.price -
-                      product?.attributes?.discountPercentage}{" "}
+                  product?.attributes?.discountPercentage
+                    ? Math.ceil(
+                        product?.attributes?.price -
+                          product?.attributes?.discountPercentage
+                      )
+                    : product?.attributes?.price &&
+                      Math.ceil(product?.attributes?.price)}{" "}
                   USD
                 </Text>
-                <Text
-                  as={"del"}
-                  color={colorMode === "light" ? "gray.900" : "gray.400"}
-                  fontWeight={300}
-                  fontSize={"2xl"}
-                >
-                  ${product?.attributes?.price} USD
-                </Text>
+                {product?.attributes?.discountPercentage && (
+                  <Text
+                    as={"del"}
+                    color={colorMode === "light" ? "gray.900" : "gray.400"}
+                    fontWeight={300}
+                    fontSize={"2xl"}
+                  >
+                    $
+                    {product?.attributes?.price &&
+                      Math.ceil(product?.attributes?.price)}{" "}
+                    USD
+                  </Text>
+                )}
               </Stack>
             </Box>
             <Stack

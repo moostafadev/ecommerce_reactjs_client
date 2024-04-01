@@ -15,8 +15,16 @@ const MainCard = ({ id, attributes, category, typeData }: IProduct) => {
     <Card maxW={"100%"}>
       <CardBody display={"flex"} flexDirection={"column"}>
         <Image
-          src={attributes?.thumbnail?.data?.attributes?.url}
-          alt={attributes?.thumbnail?.data?.attributes?.alternativeText}
+          src={
+            attributes?.thumbnail?.data?.attributes?.url
+              ? attributes?.thumbnail?.data?.attributes?.url
+              : "https://res.cloudinary.com/dvtmqtcyl/image/upload/v1712000980/No_Products_55d29f8b32.jpg"
+          }
+          alt={
+            attributes?.thumbnail?.data?.attributes?.alternativeText
+              ? attributes?.thumbnail?.data?.attributes?.alternativeText
+              : "NoProduct"
+          }
           rounded="lg"
           mx={"auto"}
           objectFit={"cover"}
@@ -38,23 +46,32 @@ const MainCard = ({ id, attributes, category, typeData }: IProduct) => {
               <Stack flexDirection={"row"} alignItems={"center"}>
                 <Text>
                   $
-                  {attributes?.price &&
-                    attributes?.discountPercentage &&
-                    Math.ceil(
-                      attributes?.price - attributes?.discountPercentage
-                    )}
+                  {attributes?.price && attributes?.discountPercentage
+                    ? Math.ceil(
+                        attributes?.price - attributes?.discountPercentage
+                      )
+                    : attributes?.price && Math.ceil(attributes?.price)}
                 </Text>
-                <Text as="del" color={"gray"}>
-                  ${attributes?.price && Math.ceil(attributes?.price)}
-                </Text>
+                {attributes?.discountPercentage && (
+                  <Text as="del" color={"gray"}>
+                    ${attributes?.price && Math.ceil(attributes?.price)}
+                  </Text>
+                )}
               </Stack>
               <Stack flexDirection={"row"} alignItems={"center"}>
                 <Text>{category?.attributes?.title}</Text>
                 <Image
-                  src={category?.attributes?.thumbnail?.data?.attributes?.url}
+                  src={
+                    category?.attributes?.thumbnail?.data?.attributes?.url
+                      ? category?.attributes?.thumbnail?.data?.attributes?.url
+                      : "https://res.cloudinary.com/dvtmqtcyl/image/upload/v1712000980/No_Products_55d29f8b32.jpg"
+                  }
                   alt={
                     category?.attributes?.thumbnail?.data?.attributes
                       ?.alternativeText
+                      ? category?.attributes?.thumbnail?.data?.attributes
+                          ?.alternativeText
+                      : "NoProduct"
                   }
                   rounded="100%"
                   objectFit={"cover"}

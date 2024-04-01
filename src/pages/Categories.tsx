@@ -38,7 +38,6 @@ const CategoriesPage = () => {
       </Container>
     );
   if (error) return <h3>{error.message}</h3>;
-  console.log(categoriesData?.data?.data);
 
   return (
     <Container maxW={MAX_WIDTH_CONTAINER}>

@@ -34,7 +34,7 @@ const ProductsPage = () => {
       <Container maxW={MAX_WIDTH_CONTAINER}>
         <Grid
           marginY={30}
-          templateColumns={"repeat(auto-fill, minmax(300px, 1fr))"}
+          templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
           gap={"3"}
         >
           {Array.from({ length: 10 }, (_, index) => (

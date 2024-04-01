@@ -32,14 +32,31 @@ const CardSection = ({
       alignItems={"center"}
       height={{ lg: "300px" }}
     >
-      <Image
-        src={image}
-        alt={image}
-        rounded="lg"
-        mx={"auto"}
-        objectFit={"cover"}
-        h={"100%"}
-      />
+      {image ? (
+        <Image
+          src={image}
+          alt={image}
+          rounded="lg"
+          mx={"auto"}
+          objectFit={"cover"}
+          h={"100%"}
+        />
+      ) : (
+        <Image
+          src={
+            "https://res.cloudinary.com/dvtmqtcyl/image/upload/v1712000980/No_Products_55d29f8b32.jpg"
+          }
+          alt={"NoProduct"}
+          maxW={{ sm: "500px", md: "600px", lg: "850px" }}
+          display={"flex"}
+          flexDirection={{ base: "column", lg: "row" }}
+          rounded="lg"
+          mx={"auto"}
+          alignItems={"center"}
+          height={{ lg: "300px" }}
+        />
+      )}
+
       <CardBody display={"flex"} flexDirection={"column"}>
         <Stack flexGrow={1} justifyContent={"space-between"}>
           <Heading size="md" textAlign={"center"}>
