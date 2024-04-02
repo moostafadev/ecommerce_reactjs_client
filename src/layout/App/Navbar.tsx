@@ -77,8 +77,14 @@ const Navbar = () => {
                 aria-label={"Open Menu"}
                 display={{ md: "none" }}
                 onClick={isOpen ? onClose : onOpen}
+                padding={{ base: "0px", md: "16px" }}
               />
-              <Box as={Link} to="/" fontSize={"18px"} fontWeight={"bold"}>
+              <Box
+                as={Link}
+                to="/"
+                fontSize={{ base: "14px", sm: "18px" }}
+                fontWeight={"bold"}
+              >
                 E-commerce
               </Box>
               <HStack
@@ -95,9 +101,21 @@ const Navbar = () => {
             </HStack>
 
             <Flex alignItems={"center"}>
-              <Stack direction={"row"} spacing={7}>
-                <Button onClick={toggleColorMode}>
+              <Stack direction={"row"} spacing={{ base: "4px", md: "16px" }}>
+                <Button
+                  onClick={toggleColorMode}
+                  padding={{ base: "0px", md: "16px" }}
+                >
                   {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                </Button>
+                <Button
+                  as={Link}
+                  to={"/login"}
+                  colorScheme="green"
+                  variant="ghost"
+                  padding={{ base: "6px 8px", md: "16px" }}
+                >
+                  Login
                 </Button>
 
                 <Menu>
