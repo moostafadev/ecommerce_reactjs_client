@@ -106,27 +106,37 @@ const CategoryPage = () => {
               <VStack spacing={{ base: 4, sm: 6 }}>
                 <Text fontSize={"lg"}>{category?.attributes?.description}</Text>
               </VStack>
-              <Grid
-                templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
-                gap={"3"}
-              >
-                {products.length ? (
-                  products?.map((product: IProduct, idx) => (
-                    <MainCard
-                      key={idx}
-                      id={product.id}
-                      attributes={product.attributes}
-                      category={category}
-                      typeData="product"
-                    />
-                  ))
-                ) : (
-                  <Text>No products yet !</Text>
-                )}
-              </Grid>
             </Stack>
           </Stack>
         </SimpleGrid>
+        <Heading
+          mb={"10px"}
+          borderTop={
+            colorMode === "dark" ? "1px solid white" : "1px solid black"
+          }
+          pt={"16px"}
+        >
+          Products
+        </Heading>
+        <Grid
+          templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
+          gap={"3"}
+          py={"16px"}
+        >
+          {products.length ? (
+            products?.map((product: IProduct, idx) => (
+              <MainCard
+                key={idx}
+                id={product.id}
+                attributes={product.attributes}
+                category={category}
+                typeData="product"
+              />
+            ))
+          ) : (
+            <Text>No products yet !</Text>
+          )}
+        </Grid>
       </Container>
     </Box>
   );

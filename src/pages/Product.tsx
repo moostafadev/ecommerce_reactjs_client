@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import {
   Box,
@@ -23,10 +23,11 @@ import Slider from "react-slick";
 import { MdLocalShipping } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { IProduct } from "../interfaces";
+import { ICategory, IProduct } from "../interfaces";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import React from "react";
 import ProductPageSkeleton from "../components/ProductPageSkeleton";
+import MainCard from "../components/MainCard";
 
 const settings = {
   dots: true,
@@ -55,12 +56,68 @@ const ProductPage = () => {
     return res;
   };
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", id],
     queryFn: getProduct,
   });
+
   const product: IProduct = data?.data?.data;
 
-  if (isLoading || isFetching)
+  const getSimilarProduct = async () => {
+    const res = await axios.get(
+      `${
+        import.meta.env.VITE_SERVER_URL
+      }/api/products?populate=*&filters[categories][title][$eq]=${
+        product?.attributes?.categories?.data[0]?.attributes?.title
+      }`
+    );
+    return res;
+  };
+  const {
+    data: dataSimilarProduct,
+    isLoading: isLoadingSimilarProduct,
+    isFetching: isFetchingSimilarProduct,
+  } = useQuery({
+    queryKey: ["productsSimilar", product],
+    queryFn: getSimilarProduct,
+  });
+
+  const productsSimilar: IProduct[] = dataSimilarProduct?.data?.data;
+  const productsSimilarFiltered: IProduct[] = productsSimilar?.filter(
+    (productS) => productS?.attributes?.title !== product?.attributes?.title
+  );
+
+  const getCategory = async () => {
+    if (product && product.attributes.categories.data[0]?.id) {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/api/categories/${
+          product.attributes.categories.data[0]?.id
+        }?populate=*`
+      );
+      return res;
+    } else {
+      return Promise.resolve({ data: { data: {} } });
+    }
+  };
+
+  const {
+    data: dataCategory,
+    isLoading: isLoadingCategory,
+    isFetching: isFetchingCategory,
+  } = useQuery({
+    queryKey: [`category`, product],
+    queryFn: getCategory,
+  });
+
+  const category: ICategory = dataCategory?.data?.data;
+
+  if (
+    isLoading ||
+    isFetching ||
+    isLoadingSimilarProduct ||
+    isFetchingSimilarProduct ||
+    isLoadingCategory ||
+    isFetchingCategory
+  )
     return (
       <Container
         maxW={MAX_WIDTH_CONTAINER}
@@ -241,7 +298,13 @@ const ProductPage = () => {
                 >
                   Category
                 </Text>
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+                <SimpleGrid
+                  columns={{ base: 1, md: 2 }}
+                  spacing={10}
+                  fontWeight={"bold"}
+                  as={Link}
+                  to={`/categories/${product?.attributes?.categories?.data[0]?.id}`}
+                >
                   {product?.attributes?.categories?.data[0]?.attributes?.title}
                 </SimpleGrid>
               </Box>
@@ -306,6 +369,34 @@ const ProductPage = () => {
             </Stack>
           </Stack>
         </SimpleGrid>
+        {productsSimilarFiltered.length ? (
+          <>
+            <Heading
+              mb={"10px"}
+              borderTop={
+                colorMode === "dark" ? "1px solid white" : "1px solid black"
+              }
+              pt={"16px"}
+            >
+              Similar Products
+            </Heading>
+            <Grid
+              templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
+              gap={"3"}
+              py={"16px"}
+            >
+              {productsSimilarFiltered?.map((product: IProduct, idx) => (
+                <MainCard
+                  key={idx}
+                  id={product.id}
+                  attributes={product.attributes}
+                  category={category}
+                  typeData="product"
+                />
+              ))}
+            </Grid>
+          </>
+        ) : null}
       </Container>
     </Box>
   );
