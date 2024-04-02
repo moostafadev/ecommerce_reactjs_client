@@ -13,7 +13,7 @@ const ProductsPage = () => {
     );
     return res;
   };
-  const { isLoading, data, error, isFetching } = useQuery({
+  const { isLoading, data, error } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
@@ -29,7 +29,7 @@ const ProductsPage = () => {
     queryFn: getCategories,
   });
 
-  if (isLoading || isFetching)
+  if (isLoading)
     return (
       <Container maxW={MAX_WIDTH_CONTAINER}>
         <Grid

@@ -17,13 +17,12 @@ const CategoriesPage = () => {
     data: categoriesData,
     isLoading,
     error,
-    isFetching,
   } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
   });
 
-  if (isLoading || isFetching)
+  if (isLoading)
     return (
       <Container maxW={MAX_WIDTH_CONTAINER}>
         <Grid

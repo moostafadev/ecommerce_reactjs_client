@@ -48,7 +48,7 @@ const CarouselSection = ({
     );
     return res;
   };
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: typeData === "product" ? ["products"] : ["categories"],
     queryFn: getData,
   });
@@ -62,7 +62,7 @@ const CarouselSection = ({
       }))
     : null;
 
-  if (isLoading || isFetching)
+  if (isLoading)
     return (
       <Container
         maxW={"100%"}

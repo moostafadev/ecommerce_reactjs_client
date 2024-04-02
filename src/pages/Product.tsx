@@ -55,7 +55,7 @@ const ProductPage = () => {
     );
     return res;
   };
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["products", id],
     queryFn: getProduct,
   });
@@ -72,14 +72,11 @@ const ProductPage = () => {
     );
     return res;
   };
-  const {
-    data: dataSimilarProduct,
-    isLoading: isLoadingSimilarProduct,
-    isFetching: isFetchingSimilarProduct,
-  } = useQuery({
-    queryKey: ["productsSimilar", product],
-    queryFn: getSimilarProduct,
-  });
+  const { data: dataSimilarProduct, isLoading: isLoadingSimilarProduct } =
+    useQuery({
+      queryKey: ["productsSimilar", product],
+      queryFn: getSimilarProduct,
+    });
 
   const productsSimilar: IProduct[] = dataSimilarProduct?.data?.data;
   const productsSimilarFiltered: IProduct[] = productsSimilar?.filter(
@@ -99,25 +96,14 @@ const ProductPage = () => {
     }
   };
 
-  const {
-    data: dataCategory,
-    isLoading: isLoadingCategory,
-    isFetching: isFetchingCategory,
-  } = useQuery({
+  const { data: dataCategory, isLoading: isLoadingCategory } = useQuery({
     queryKey: [`category`, product],
     queryFn: getCategory,
   });
 
   const category: ICategory = dataCategory?.data?.data;
 
-  if (
-    isLoading ||
-    isFetching ||
-    isLoadingSimilarProduct ||
-    isFetchingSimilarProduct ||
-    isLoadingCategory ||
-    isFetchingCategory
-  )
+  if (isLoading || isLoadingSimilarProduct || isLoadingCategory)
     return (
       <Container
         maxW={MAX_WIDTH_CONTAINER}

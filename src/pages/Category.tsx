@@ -30,7 +30,7 @@ const CategoryPage = () => {
     return res;
   };
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: [`category-${id}`],
     queryFn: getCategory,
   });
@@ -48,18 +48,14 @@ const CategoryPage = () => {
     return res;
   };
 
-  const {
-    data: productData,
-    isLoading: isLoadingProduct,
-    isFetching: isFetchingProduct,
-  } = useQuery({
+  const { data: productData, isLoading: isLoadingProduct } = useQuery({
     queryKey: [`product-${category}`],
     queryFn: getProduct,
   });
 
   const products: IProduct[] = productData?.data?.data;
 
-  if (isLoading || isLoadingProduct || isFetching || isFetchingProduct)
+  if (isLoading || isLoadingProduct)
     return (
       <Container
         maxW={MAX_WIDTH_CONTAINER}
