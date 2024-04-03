@@ -1,16 +1,14 @@
 import { Container, Grid } from "@chakra-ui/react";
-import axios from "axios";
 import { IProduct } from "../interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import MainCard from "../components/MainCard";
 import MainCardSkeleton from "../components/MainCardSkeleton";
+import { axiosInstance } from "../api/axios.config";
 
 const ProductsPage = () => {
   const getProducts = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/products?populate=*`
-    );
+    const res = await axiosInstance.get(`/products?populate=*`);
     return res;
   };
   const { isLoading, data, error } = useQuery({
@@ -19,9 +17,7 @@ const ProductsPage = () => {
   });
 
   const getCategories = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/categories?populate=*`
-    );
+    const res = await axiosInstance.get(`/categories?populate=*`);
     return res;
   };
   const { data: categoriesData } = useQuery({

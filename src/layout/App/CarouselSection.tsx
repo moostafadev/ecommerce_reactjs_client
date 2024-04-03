@@ -11,11 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import Slider from "react-slick";
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { ICategory, IProduct } from "../../interfaces";
 import CardSection from "../../components/CardSection";
 import CardSectionSkeleton from "../../components/CardSectionSkeleton";
+import { axiosInstance } from "../../api/axios.config";
 
 const settings = {
   dots: true,
@@ -41,10 +41,8 @@ const CarouselSection = ({
   const side = useBreakpointValue({ base: "30%", md: "40px" });
 
   const getData = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/${
-        typeData === "product" ? "products" : "categories"
-      }?populate=*`
+    const res = await axiosInstance.get(
+      `/${typeData === "product" ? "products" : "categories"}?populate=*`
     );
     return res;
   };

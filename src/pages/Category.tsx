@@ -14,19 +14,17 @@ import {
   Grid,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { ICategory, IProduct } from "../interfaces";
 import ProductPageSkeleton from "../components/ProductPageSkeleton";
 import MainCard from "../components/MainCard";
+import { axiosInstance } from "../api/axios.config";
 
 const CategoryPage = () => {
   const { id } = useParams();
   const { colorMode } = useColorMode();
 
   const getCategory = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/categories/${id}?populate=*`
-    );
+    const res = await axiosInstance.get(`/categories/${id}?populate=*`);
     return res;
   };
 
@@ -38,12 +36,8 @@ const CategoryPage = () => {
   const category: ICategory = data?.data?.data;
 
   const getProduct = async () => {
-    const res = await axios.get(
-      `${
-        import.meta.env.VITE_SERVER_URL
-      }/api/products?populate=*&filters[categories][title][$eq]=${
-        category.attributes.title
-      }`
+    const res = await axiosInstance.get(
+      `/products?populate=*&filters[categories][title][$eq]=${category.attributes.title}`
     );
     return res;
   };

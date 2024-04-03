@@ -22,12 +22,12 @@ import {
 import Slider from "react-slick";
 import { MdLocalShipping } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { ICategory, IProduct } from "../interfaces";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import React from "react";
 import ProductPageSkeleton from "../components/ProductPageSkeleton";
 import MainCard from "../components/MainCard";
+import { axiosInstance } from "../api/axios.config";
 
 const settings = {
   dots: true,
@@ -50,9 +50,7 @@ const ProductPage = () => {
   const side = useBreakpointValue({ base: "30%", md: "40px" });
 
   const getProduct = async () => {
-    const res = await axios.get(
-      `${import.meta.env.VITE_SERVER_URL}/api/products/${id}?populate=*`
-    );
+    const res = await axiosInstance.get(`/products/${id}?populate=*`);
     return res;
   };
   const { data, isLoading } = useQuery({
@@ -63,12 +61,8 @@ const ProductPage = () => {
   const product: IProduct = data?.data?.data;
 
   const getSimilarProduct = async () => {
-    const res = await axios.get(
-      `${
-        import.meta.env.VITE_SERVER_URL
-      }/api/products?populate=*&filters[categories][title][$eq]=${
-        product?.attributes?.categories?.data[0]?.attributes?.title
-      }`
+    const res = await axiosInstance.get(
+      `/products?populate=*&filters[categories][title][$eq]=${product?.attributes?.categories?.data[0]?.attributes?.title}`
     );
     return res;
   };
@@ -85,10 +79,8 @@ const ProductPage = () => {
 
   const getCategory = async () => {
     if (product && product.attributes.categories.data[0]?.id) {
-      const res = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/categories/${
-          product.attributes.categories.data[0]?.id
-        }?populate=*`
+      const res = await axiosInstance.get(
+        `/categories/${product.attributes.categories.data[0]?.id}?populate=*`
       );
       return res;
     } else {
