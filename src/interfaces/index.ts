@@ -45,6 +45,7 @@ export interface ICategory {
 }
 
 export interface IProduct {
+  quantity: number;
   typeData?: "product" | "category";
   id: number;
   category?: ICategory;

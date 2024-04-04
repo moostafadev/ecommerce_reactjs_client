@@ -5,7 +5,6 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
-  Input,
   DrawerFooter,
   Button,
 } from "@chakra-ui/react";
@@ -34,9 +33,7 @@ const CartDrawer = () => {
         <DrawerCloseButton />
         <DrawerHeader>Your Shopping Cart</DrawerHeader>
 
-        <DrawerBody>
-          <Input placeholder="Type here..." />
-        </DrawerBody>
+        <DrawerBody></DrawerBody>
 
         <DrawerFooter>
           <Button colorScheme="red" variant="outline" mr={3} onClick={onClose}>
