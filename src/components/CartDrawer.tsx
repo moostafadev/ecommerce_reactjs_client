@@ -7,6 +7,8 @@ import {
   DrawerBody,
   DrawerFooter,
   Button,
+  Text,
+  Flex,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,7 +16,7 @@ import {
   selectGlobal,
 } from "../app/features/globalSlice";
 import React from "react";
-import { selectCart } from "../app/features/cartSlice";
+import { removeFromCart, selectCart } from "../app/features/cartSlice";
 import CartDrawerItems from "./CartDrawerItems";
 
 const CartDrawer = () => {
@@ -23,6 +25,19 @@ const CartDrawer = () => {
   const { cartProduct } = useSelector(selectCart);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   const onClose = () => dispatch(OnCloseCartDrawerAction());
+
+  const removeAllItemsHandler = () => {
+    dispatch(removeFromCart(cartProduct));
+  };
+  const prices = cartProduct.map(
+    (item) => item.attributes.price && item.attributes.price * item.quantity
+  );
+  const countPrices =
+    prices.length && prices.reduce((prev, cur) => prev && cur && prev + cur);
+
+  const items = cartProduct.map((item) => item.quantity);
+  const countItems =
+    items.length && items.reduce((prev, cur) => prev && cur && prev + cur);
 
   return (
     <Drawer
@@ -37,7 +52,7 @@ const CartDrawer = () => {
         <DrawerHeader>Your Shopping Cart</DrawerHeader>
 
         <DrawerBody>
-          {cartProduct.map((item, idx) => (
+          {cartProduct?.map((item, idx) => (
             <CartDrawerItems
               key={idx}
               id={item.id}
@@ -47,10 +62,25 @@ const CartDrawer = () => {
           ))}
         </DrawerBody>
 
-        <DrawerFooter>
-          <Button colorScheme="red" variant="outline" mr={3} onClick={onClose}>
-            Clear all
-          </Button>
+        <DrawerFooter justifyContent={"space-between"}>
+          {cartProduct.length ? (
+            <>
+              <Flex flexDir={"column"} gap={"8px"}>
+                <Text>All price: ${countPrices} USD</Text>
+                <Text>
+                  Quantity items: {countItems}{" "}
+                  {countItems < 2 ? "Item" : "Items"}
+                </Text>
+              </Flex>
+              <Button
+                colorScheme="red"
+                variant="outline"
+                onClick={removeAllItemsHandler}
+              >
+                Clear all
+              </Button>
+            </>
+          ) : null}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
