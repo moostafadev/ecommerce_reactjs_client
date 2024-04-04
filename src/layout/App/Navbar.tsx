@@ -16,10 +16,19 @@ import {
   useDisclosure,
   IconButton,
   Container,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  useToast,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { MAX_WIDTH_CONTAINER } from "../../common/varables";
+import cookieServices from "../../services/cookieServices";
+import React from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -63,8 +72,27 @@ const NavLink = (props: Props) => {
 };
 
 const Navbar = () => {
+  const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOp, onOpen: onOp, onClose: onCl } = useDisclosure();
+  const cancelRef = React.useRef<HTMLButtonElement>(null);
+  const token: string = cookieServices.get("jwt");
+
+  const handleLogout = () => {
+    cookieServices.remove("jwt");
+    onCl();
+    toast({
+      title: "Logout Successful",
+      status: "success",
+      duration: 500,
+      isClosable: true,
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  };
+
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")}>
@@ -108,51 +136,59 @@ const Navbar = () => {
                 >
                   {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
                 </Button>
-                <Button
-                  as={Link}
-                  to={"/login"}
-                  colorScheme="green"
-                  variant="ghost"
-                  padding={{ base: "6px 8px", md: "16px" }}
-                >
-                  Login
-                </Button>
-
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    rounded={"full"}
-                    variant={"link"}
-                    cursor={"pointer"}
-                    minW={0}
-                  >
-                    <Avatar
-                      size={"sm"}
-                      src={"https://avatars.dicebear.com/api/male/username.svg"}
-                    />
-                  </MenuButton>
-                  <MenuList alignItems={"center"}>
-                    <br />
-                    <Center>
+                {token ? (
+                  <Menu>
+                    <MenuButton
+                      as={Button}
+                      rounded={"full"}
+                      variant={"link"}
+                      cursor={"pointer"}
+                      minW={0}
+                    >
                       <Avatar
-                        size={"2xl"}
+                        size={"sm"}
                         src={
                           "https://avatars.dicebear.com/api/male/username.svg"
                         }
                       />
-                    </Center>
-                    <br />
-                    <Center>
-                      <p>Username</p>
-                    </Center>
-                    <br />
-                    <MenuDivider />
-                    <MenuItem>Profile</MenuItem>
-                    <MenuItem color={"red.500"} fontWeight={"semibold"}>
-                      Logout
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
+                    </MenuButton>
+                    <MenuList alignItems={"center"}>
+                      <br />
+                      <Center>
+                        <Avatar
+                          size={"2xl"}
+                          src={
+                            "https://avatars.dicebear.com/api/male/username.svg"
+                          }
+                        />
+                      </Center>
+                      <br />
+                      <Center>
+                        <p>Username</p>
+                      </Center>
+                      <br />
+                      <MenuDivider />
+                      <MenuItem>Profile</MenuItem>
+                      <MenuItem
+                        color={"red.500"}
+                        fontWeight={"semibold"}
+                        onClick={onOp}
+                      >
+                        Logout
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                ) : (
+                  <Button
+                    as={Link}
+                    to={"/login"}
+                    colorScheme="green"
+                    variant="ghost"
+                    padding={{ base: "6px 8px", md: "16px" }}
+                  >
+                    Login
+                  </Button>
+                )}
               </Stack>
             </Flex>
           </Flex>
@@ -169,6 +205,24 @@ const Navbar = () => {
           ) : null}
         </Container>
       </Box>
+      <AlertDialog isOpen={isOp} leastDestructiveRef={cancelRef} onClose={onCl}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirm Logout
+            </AlertDialogHeader>
+            <AlertDialogBody>Are you sure you want to log out?</AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onCl}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleLogout} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 };
