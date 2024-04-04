@@ -147,7 +147,7 @@ const Navbar = () => {
                 {token ? (
                   <>
                     <Button
-                      padding={{ base: "0px", md: "16px" }}
+                      padding={{ base: "8px", md: "16px" }}
                       display={"flex"}
                       gap={"4px"}
                       onClick={() => dispatch(OnOpenCartDrawerAction())}
