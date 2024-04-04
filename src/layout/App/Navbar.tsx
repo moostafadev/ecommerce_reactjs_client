@@ -23,12 +23,17 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   useToast,
+  Text,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { MAX_WIDTH_CONTAINER } from "../../common/varables";
 import cookieServices from "../../services/cookieServices";
 import React from "react";
+import { BsCart } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCart } from "../../app/features/cartSlice";
+import { OnOpenCartDrawerAction } from "../../app/features/globalSlice";
 
 interface Props {
   children: React.ReactNode;
@@ -73,10 +78,12 @@ const NavLink = (props: Props) => {
 
 const Navbar = () => {
   const toast = useToast();
+  const dispatch = useDispatch();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isOp, onOpen: onOp, onClose: onCl } = useDisclosure();
   const cancelRef = React.useRef<HTMLButtonElement>(null);
+  const { cartProduct } = useSelector(selectCart);
   const token: string = cookieServices.get("jwt");
 
   const handleLogout = () => {
@@ -135,6 +142,15 @@ const Navbar = () => {
                   padding={{ base: "0px", md: "16px" }}
                 >
                   {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                </Button>
+                <Button
+                  padding={{ base: "0px", md: "16px" }}
+                  display={"flex"}
+                  gap={"4px"}
+                  onClick={() => dispatch(OnOpenCartDrawerAction())}
+                >
+                  <BsCart />
+                  <Text>({cartProduct.length})</Text>
                 </Button>
                 {token ? (
                   <Menu>
@@ -217,7 +233,7 @@ const Navbar = () => {
                 Cancel
               </Button>
               <Button colorScheme="red" onClick={handleLogout} ml={3}>
-                Delete
+                Logout
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

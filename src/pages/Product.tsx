@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import {
   Box,
@@ -28,6 +28,9 @@ import React from "react";
 import ProductPageSkeleton from "../components/ProductPageSkeleton";
 import MainCard from "../components/MainCard";
 import { axiosInstance } from "../api/axios.config";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../app/features/cartSlice";
+import cookieServices from "../services/cookieServices";
 
 const settings = {
   dots: true,
@@ -42,9 +45,12 @@ const settings = {
 };
 
 const ProductPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
   const { colorMode } = useColorMode();
   const [slider, setSlider] = React.useState<Slider | null>(null);
+  const token: string = cookieServices.get("jwt");
 
   const top = useBreakpointValue({ base: "90%", md: "50%" });
   const side = useBreakpointValue({ base: "30%", md: "40px" });
@@ -94,6 +100,14 @@ const ProductPage = () => {
   });
 
   const category: ICategory = dataCategory?.data?.data;
+
+  const addToCartHandler = () => {
+    if (token) {
+      dispatch(addToCart(product));
+    } else {
+      navigate("/login");
+    }
+  };
 
   if (isLoading || isLoadingSimilarProduct || isLoadingCategory)
     return (
@@ -333,6 +347,7 @@ const ProductPage = () => {
                 transform: "translateY(2px)",
                 boxShadow: "lg",
               }}
+              onClick={addToCartHandler}
             >
               Add to cart
             </Button>
