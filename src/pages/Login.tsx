@@ -14,18 +14,24 @@ import {
   InputRightElement,
   FormHelperText,
   useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { ChangeEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectLogin, userLogin } from "../app/features/loginSlice";
-import { AppDispatch } from "../app/store.";
 import { IUser } from "../interfaces";
+import { axiosInstance } from "../api/axios.config";
+import { AxiosError } from "axios";
+import cookieServices from "../services/cookieServices";
+
+interface IErrorResponse {
+  error: {
+    message?: string;
+  };
+}
 
 const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
   const { colorMode } = useColorMode();
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector(selectLogin);
-
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser>({
     identifier: "",
     password: "",
@@ -57,7 +63,50 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
     }
     setIsEmail(false);
     setIsPassword(false);
-    dispatch(userLogin(user));
+    onSubmit();
+  };
+
+  const onSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const { status, data: userData } = await axiosInstance.post(
+        "/auth/local",
+        user
+      );
+      const date = new Date();
+      const IN_DAYES = 5;
+      const EXPIRES_IN_DAYES = date.getTime() + 1000 * 60 * 60 * 24 * IN_DAYES;
+      date.setTime(EXPIRES_IN_DAYES);
+      const options = {
+        path: "/",
+        expires: date,
+      };
+      cookieServices.set("jwt", userData.jwt, options);
+      if (status === 200) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back! You have successfully logged in.",
+          status: "success",
+          duration: 1000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          window.location.replace("/");
+        }, 1000);
+      }
+    } catch (error) {
+      const errorObj = error as AxiosError<IErrorResponse>;
+      toast({
+        title: errorObj.response?.data.error.message,
+        description:
+          "Unable to log in. Please double-check your email and password and try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isAuthantecated) {
@@ -151,7 +200,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
                   isEmail || isPassword ? { bg: "red.500" } : { bg: "blue.500" }
                 }
                 type="submit"
-                isLoading={loading}
+                isLoading={isLoading}
               >
                 Sign in
               </Button>

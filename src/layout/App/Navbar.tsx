@@ -143,57 +143,60 @@ const Navbar = () => {
                 >
                   {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
                 </Button>
-                <Button
-                  padding={{ base: "0px", md: "16px" }}
-                  display={"flex"}
-                  gap={"4px"}
-                  onClick={() => dispatch(OnOpenCartDrawerAction())}
-                >
-                  <BsCart />
-                  <Text>({cartProduct.length})</Text>
-                </Button>
+
                 {token ? (
-                  <Menu>
-                    <MenuButton
-                      as={Button}
-                      rounded={"full"}
-                      variant={"link"}
-                      cursor={"pointer"}
-                      minW={0}
+                  <>
+                    <Button
+                      padding={{ base: "0px", md: "16px" }}
+                      display={"flex"}
+                      gap={"4px"}
+                      onClick={() => dispatch(OnOpenCartDrawerAction())}
                     >
-                      <Avatar
-                        size={"sm"}
-                        src={
-                          "https://avatars.dicebear.com/api/male/username.svg"
-                        }
-                      />
-                    </MenuButton>
-                    <MenuList alignItems={"center"}>
-                      <br />
-                      <Center>
+                      <BsCart />
+                      <Text>({cartProduct.length})</Text>
+                    </Button>
+                    <Menu>
+                      <MenuButton
+                        as={Button}
+                        rounded={"full"}
+                        variant={"link"}
+                        cursor={"pointer"}
+                        minW={0}
+                      >
                         <Avatar
-                          size={"2xl"}
+                          size={"sm"}
                           src={
                             "https://avatars.dicebear.com/api/male/username.svg"
                           }
                         />
-                      </Center>
-                      <br />
-                      <Center>
-                        <p>Username</p>
-                      </Center>
-                      <br />
-                      <MenuDivider />
-                      <MenuItem>Profile</MenuItem>
-                      <MenuItem
-                        color={"red.500"}
-                        fontWeight={"semibold"}
-                        onClick={onOp}
-                      >
-                        Logout
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
+                      </MenuButton>
+                      <MenuList alignItems={"center"}>
+                        <br />
+                        <Center>
+                          <Avatar
+                            size={"2xl"}
+                            src={
+                              "https://avatars.dicebear.com/api/male/username.svg"
+                            }
+                          />
+                        </Center>
+                        <br />
+                        <Center>
+                          <p>Username</p>
+                        </Center>
+                        <br />
+                        <MenuDivider />
+                        <MenuItem>Profile</MenuItem>
+                        <MenuItem
+                          color={"red.500"}
+                          fontWeight={"semibold"}
+                          onClick={onOp}
+                        >
+                          Logout
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </>
                 ) : (
                   <Button
                     as={Link}
