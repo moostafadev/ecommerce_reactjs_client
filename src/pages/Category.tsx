@@ -12,6 +12,7 @@ import {
   useColorMode,
   Image,
   Grid,
+  Button,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { ICategory, IProduct } from "../interfaces";
@@ -62,10 +63,13 @@ const CategoryPage = () => {
   return (
     <Box minH={"calc(100vh - 64px)"}>
       <Container maxW={MAX_WIDTH_CONTAINER}>
+        <Button onClick={() => history.back()} colorScheme="orange" mt={"16px"}>
+          Back
+        </Button>
         <SimpleGrid
           columns={{ base: 1, lg: 2 }}
           spacing={{ base: 8, md: 10 }}
-          py={{ base: 18, md: "30px" }}
+          py="16px"
         >
           <Image
             src={category?.attributes?.thumbnail?.data?.attributes?.url}

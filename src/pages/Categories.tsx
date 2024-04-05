@@ -47,7 +47,7 @@ const CategoriesPage = () => {
           <MainCard
             key={category.id}
             id={category.id}
-            attributes={category.attributes}
+            attributes={category?.attributes}
             typeData="category"
           />
         ))}

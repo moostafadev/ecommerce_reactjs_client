@@ -2,7 +2,7 @@ import { Flex, Heading, Text } from "@chakra-ui/react";
 import { axiosInstance } from "../../api/axios.config";
 import { useQuery } from "@tanstack/react-query";
 import { IProduct } from "../../interfaces";
-import DashboardTableProducts from "../../components/DashboardTableProducts";
+import DashboardTable from "../../components/DashboardTable";
 
 const ProductsDashboardPage = () => {
   const getProducts = async () => {
@@ -32,7 +32,7 @@ const ProductsDashboardPage = () => {
   return (
     <Flex flexDir={"column"} gap={"30px"}>
       <Heading>Manage products</Heading>
-      <DashboardTableProducts data={products} tHeadData={headTable} />
+      <DashboardTable data={products} tHeadData={headTable} isProduct={true} />
     </Flex>
   );
 };

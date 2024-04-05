@@ -30,8 +30,8 @@ export interface ICategory {
   typeData?: "product" | "category";
   id: number;
   attributes: {
-    title: string;
     description: string;
+    title: string;
     categories: {
       data: ICategories[];
     };

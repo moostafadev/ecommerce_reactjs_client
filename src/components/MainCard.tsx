@@ -50,12 +50,11 @@ const MainCard = ({ id, attributes, category, typeData }: IProduct) => {
                     ? Math.ceil(
                         attributes?.price - attributes?.discountPercentage
                       )
-                    : attributes?.price && Math.ceil(attributes?.price)}{" "}
-                  USD
+                    : attributes?.price && Math.ceil(attributes?.price)}
                 </Text>
                 {attributes?.discountPercentage && (
                   <Text as="del" color={"gray"}>
-                    ${attributes?.price && Math.ceil(attributes?.price)} USD
+                    ${attributes?.price && Math.ceil(attributes?.price)}
                   </Text>
                 )}
               </Stack>

@@ -77,7 +77,16 @@ const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
                 />
               </ButtonGroup>
             </Flex>
-            <Text>Price: ${attributes.price} USD</Text>
+            <Text>
+              Price: $
+              {attributes.price && attributes.discountPercentage
+                ? Math.ceil(
+                    (attributes.price ?? 0) -
+                      (attributes.discountPercentage ?? 0)
+                  )
+                : attributes?.price && Math.ceil(attributes.price ?? 0)}{" "}
+              USD
+            </Text>
           </Flex>
           <Flex
             gap={"8px"}

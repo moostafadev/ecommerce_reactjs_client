@@ -123,10 +123,13 @@ const ProductPage = () => {
   return (
     <Box>
       <Container maxW={MAX_WIDTH_CONTAINER}>
+        <Button onClick={() => history.back()} colorScheme="orange" mt={"16px"}>
+          Back
+        </Button>
         <SimpleGrid
           columns={{ base: 1, lg: 2 }}
           spacing={{ base: 8, md: 10 }}
-          py={{ base: 18, md: "30px" }}
+          py={"16px"}
         >
           <Flex flexDir={"column"}>
             <Box position={"relative"} width={"full"} overflow={"hidden"}>

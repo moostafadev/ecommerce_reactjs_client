@@ -30,7 +30,14 @@ const CartDrawer = () => {
     dispatch(removeFromCart(cartProduct));
   };
   const prices = cartProduct.map(
-    (item) => item.attributes.price && item.attributes.price * item.quantity
+    (item) =>
+      item.attributes.price &&
+      item.attributes.discountPercentage &&
+      item.quantity &&
+      Math.ceil(
+        (item.attributes.price - item.attributes.discountPercentage) *
+          item.quantity
+      )
   );
   const countPrices =
     prices.length && prices.reduce((prev, cur) => prev && cur && prev + cur);
@@ -69,7 +76,7 @@ const CartDrawer = () => {
                 <Text>All price: ${countPrices} USD</Text>
                 <Text>
                   Quantity items: {countItems}{" "}
-                  {countItems < 2 ? "Item" : "Items"}
+                  {countItems && countItems < 2 ? "Item" : "Items"}
                 </Text>
               </Flex>
               <Button
