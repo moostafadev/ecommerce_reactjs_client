@@ -101,7 +101,7 @@ const TestimonialAvatar = ({
 
 const TestimonialsSection = () => {
   return (
-    <Box bg={useColorModeValue("gray.100", "gray.700")}>
+    <Box bg={useColorModeValue("white", "gray.700")}>
       <Container maxW={MAX_WIDTH_CONTAINER} py={16} as={Stack} spacing={12}>
         <Stack spacing={"5px"} align={"center"}>
           <Heading>Our Clients Speak</Heading>

@@ -18,7 +18,9 @@ export const addToShoppingCartItems = (
       isClosable: true,
     });
     return shoppingCartItems.map((item) =>
-      item.id === cartItem.id ? { ...item, quantity: item.quantity + 1 } : item
+      item.id === cartItem.id && item.quantity
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
     );
   }
   toast({
@@ -35,7 +37,9 @@ export const removeFromShoppingCartItems = (
   shoppingCartItems: IProduct[]
 ) => {
   const updatedCartItems = shoppingCartItems.map((item) =>
-    item.id === cartItem.id ? { ...item, quantity: item.quantity - 1 } : item
+    item.id === cartItem.id && item.quantity
+      ? { ...item, quantity: item.quantity - 1 }
+      : item
   );
   const itemToRemove = updatedCartItems.find(
     (item) => item.id === cartItem.id && item.quantity === 0

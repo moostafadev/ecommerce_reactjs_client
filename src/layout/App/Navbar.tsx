@@ -120,7 +120,7 @@ const Navbar = () => {
                 fontSize={{ base: "14px", sm: "18px" }}
                 fontWeight={"bold"}
               >
-                E-commerce
+                Logo
               </Box>
               <HStack
                 as={"nav"}
