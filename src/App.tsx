@@ -15,6 +15,14 @@ import UsersDashboardPage from "./pages/Dashboard/Users";
 
 function App() {
   const token: string = cookieServices.get("jwt");
+  const admin: string = cookieServices.get("user")?.role?.name;
+
+  const auth = () => {
+    if (admin === "admin") {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <>
@@ -27,7 +35,10 @@ function App() {
           <Route path="categories/:id" element={<CategoryPage />} />
           <Route path="login" element={<LoginPage isAuthantecated={token} />} />
         </Route>
-        <Route path="/dashboard/" element={<DashboardLayout />}>
+        <Route
+          path="/dashboard/"
+          element={<DashboardLayout isAuthantecated={auth()} />}
+        >
           <Route index element={<DashboardHomePage />} />
           <Route path="products" element={<ProductsDashboardPage />} />
           <Route path="categories" element={<CategoriesDashboardPage />} />

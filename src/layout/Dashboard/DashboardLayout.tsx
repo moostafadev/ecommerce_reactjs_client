@@ -21,6 +21,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  useColorMode,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
 import { IconType } from "react-icons";
@@ -215,11 +216,21 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   );
 };
 
-const DashboardLayout = () => {
+const DashboardLayout = ({
+  isAuthantecated,
+}: {
+  isAuthantecated: string | boolean;
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode } = useColorMode();
+
+  if (!isAuthantecated) {
+    history.back();
+    return;
+  }
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+    <Box minH="100vh" bg={colorMode === "light" ? "gray.100" : "gray.900"}>
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}

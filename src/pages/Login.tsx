@@ -73,6 +73,14 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
         "/auth/local",
         user
       );
+      const { status: statusMe, data: meData } = await axiosInstance.get(
+        `/users/me?populate=*`,
+        {
+          headers: {
+            Authorization: `Bearer ${userData.jwt}`,
+          },
+        }
+      );
       const date = new Date();
       const IN_DAYES = 5;
       const EXPIRES_IN_DAYES = date.getTime() + 1000 * 60 * 60 * 24 * IN_DAYES;
@@ -82,7 +90,8 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
         expires: date,
       };
       cookieServices.set("jwt", userData.jwt, options);
-      if (status === 200) {
+      cookieServices.set("user", meData);
+      if (status === 200 && statusMe === 200) {
         toast({
           title: "Login Successful",
           description: "Welcome back! You have successfully logged in.",

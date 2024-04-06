@@ -41,20 +41,37 @@ interface Props {
   onClick: () => void;
 }
 
-const Links = [
-  {
-    name: "Dashboard",
-    linkTo: "dashboard",
-  },
-  {
-    name: "Products",
-    linkTo: "products",
-  },
-  {
-    name: "Categories",
-    linkTo: "categories",
-  },
-];
+const user = cookieServices.get("user");
+
+const Links = () => {
+  if (user?.role?.name === "admin") {
+    return [
+      {
+        name: "Dashboard",
+        linkTo: "dashboard",
+      },
+      {
+        name: "Products",
+        linkTo: "products",
+      },
+      {
+        name: "Categories",
+        linkTo: "categories",
+      },
+    ];
+  } else {
+    return [
+      {
+        name: "Products",
+        linkTo: "products",
+      },
+      {
+        name: "Categories",
+        linkTo: "categories",
+      },
+    ];
+  }
+};
 
 const NavLink = (props: Props) => {
   const { children, linkTo, onClick } = props;
@@ -88,6 +105,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     cookieServices.remove("jwt");
+    cookieServices.remove("user");
     onCl();
     toast({
       title: "Logout Successful",
@@ -105,7 +123,10 @@ const Navbar = () => {
       <Box bg={useColorModeValue("gray.100", "gray.900")}>
         <Container maxW={MAX_WIDTH_CONTAINER}>
           <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-            <HStack spacing={{ lg: 8, base: 2 }} alignItems={"center"}>
+            <HStack
+              spacing={{ lg: "20px", base: "12px" }}
+              alignItems={"center"}
+            >
               <IconButton
                 size={"md"}
                 icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -118,6 +139,7 @@ const Navbar = () => {
                 as={Link}
                 to="/"
                 fontSize={{ base: "14px", sm: "18px" }}
+                mr={{ lg: "12px" }}
                 fontWeight={"bold"}
               >
                 Logo
@@ -127,7 +149,7 @@ const Navbar = () => {
                 spacing={4}
                 display={{ base: "none", md: "flex" }}
               >
-                {Links.map(({ name, linkTo }) => (
+                {Links().map(({ name, linkTo }) => (
                   <NavLink key={name} linkTo={linkTo} onClick={onClose}>
                     {name}
                   </NavLink>
@@ -182,7 +204,7 @@ const Navbar = () => {
                         </Center>
                         <br />
                         <Center>
-                          <p>Username</p>
+                          <p>{user.username}</p>
                         </Center>
                         <br />
                         <MenuDivider />
@@ -214,7 +236,7 @@ const Navbar = () => {
           {isOpen ? (
             <Box pb={4} display={{ md: "none" }}>
               <Stack as={"nav"} spacing={4}>
-                {Links.map(({ name, linkTo }) => (
+                {Links().map(({ name, linkTo }) => (
                   <NavLink key={name} linkTo={linkTo} onClick={onClose}>
                     {name}
                   </NavLink>
