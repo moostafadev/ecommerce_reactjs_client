@@ -1,19 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartSlice from "./features/cartSlice";
 import globalSlice from "./features/globalSlice";
-import storage from "redux-persist/lib/storage";
-import { persistStore, persistReducer } from "redux-persist";
-
-const persistConfig = {
-  key: "cart",
-  storage,
-};
-
-const persistedCart = persistReducer(persistConfig, cartSlice);
 
 export const store = configureStore({
   reducer: {
-    cart: persistedCart,
+    cart: cartSlice,
     global: globalSlice,
   },
 });
@@ -22,5 +13,3 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
-
-export const persister = persistStore(store);
