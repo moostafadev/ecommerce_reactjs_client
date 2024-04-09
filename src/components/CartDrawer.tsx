@@ -15,25 +15,16 @@ import {
   OnCloseCartDrawerAction,
   selectGlobal,
 } from "../app/features/globalSlice";
-import React, { useEffect } from "react";
-import {
-  fetchCartData,
-  removeFromCart,
-  selectCart,
-} from "../app/features/cartSlice";
+import React from "react";
+import { removeFromCart, selectCart } from "../app/features/cartSlice";
 import CartDrawerItems from "./CartDrawerItems";
-import { AppDispatch } from "../app/store.";
 
 const CartDrawer = () => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useDispatch();
   const { isOpenCartDrawer } = useSelector(selectGlobal);
   const { cartProduct } = useSelector(selectCart);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   const onClose = () => dispatch(OnCloseCartDrawerAction());
-
-  useEffect(() => {
-    dispatch(fetchCartData());
-  }, [dispatch]);
 
   const removeAllItemsHandler = () => {
     dispatch(removeFromCart(cartProduct));
@@ -42,10 +33,18 @@ const CartDrawer = () => {
     (item) =>
       item.attributes.price &&
       item.attributes.discountPercentage &&
-      Math.ceil(item.attributes.price - item.attributes.discountPercentage)
+      item.quantity &&
+      Math.ceil(
+        (item.attributes.price - item.attributes.discountPercentage) *
+          item.quantity
+      )
   );
   const countPrices =
     prices.length && prices.reduce((prev, cur) => prev && cur && prev + cur);
+
+  const items = cartProduct.map((item) => item.quantity);
+  const countItems =
+    items.length && items.reduce((prev, cur) => prev && cur && prev + cur);
 
   return (
     <Drawer
@@ -65,6 +64,7 @@ const CartDrawer = () => {
               key={idx}
               id={item.id}
               attributes={item.attributes}
+              quantity={item.quantity}
             />
           ))}
         </DrawerBody>
@@ -75,10 +75,8 @@ const CartDrawer = () => {
               <Flex flexDir={"column"} gap={"8px"}>
                 <Text>All price: ${countPrices} USD</Text>
                 <Text>
-                  Quantity items: {cartProduct.length}{" "}
-                  {cartProduct.length && cartProduct.length < 2
-                    ? "Item"
-                    : "Items"}
+                  Quantity items: {countItems}{" "}
+                  {countItems && countItems < 2 ? "Item" : "Items"}
                 </Text>
               </Flex>
               <Button

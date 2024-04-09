@@ -1,38 +1,53 @@
 import { createStandaloneToast } from "@chakra-ui/react";
 import { IProduct } from "../interfaces";
+
 const { toast } = createStandaloneToast();
 
 export const addToShoppingCartItems = (
   cartItem: IProduct,
   shoppingCartItems: IProduct[]
 ) => {
+  const existed = shoppingCartItems.find((item) => item.id === cartItem.id);
+  if (existed) {
+    toast({
+      title: "Added to your cart.",
+      description:
+        "This item is already exists, the quantity will be increased",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+    return shoppingCartItems.map((item) =>
+      item.id === cartItem.id && item.quantity
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+  }
   toast({
     title: "Added to your cart.",
     status: "success",
     duration: 2000,
     isClosable: true,
   });
-  return [
-    ...shoppingCartItems,
-    {
-      ...cartItem,
-      attributes: {
-        ...cartItem.attributes,
-        qty: 1,
-      },
-    },
-  ];
+  return [...shoppingCartItems, { ...cartItem, quantity: 1 }];
 };
 
 export const removeFromShoppingCartItems = (
   cartItem: IProduct,
   shoppingCartItems: IProduct[]
 ) => {
-  const filteredCartItems = shoppingCartItems.filter(
-    (item) => item.id !== cartItem.id
+  const updatedCartItems = shoppingCartItems.map((item) =>
+    item.id === cartItem.id && item.quantity
+      ? { ...item, quantity: item.quantity - 1 }
+      : item
   );
-
-  if (filteredCartItems.length < shoppingCartItems.length) {
+  const itemToRemove = updatedCartItems.find(
+    (item) => item.id === cartItem.id && item.quantity === 0
+  );
+  if (itemToRemove) {
+    const filteredCartItems = updatedCartItems.filter(
+      (item) => item.id !== cartItem.id
+    );
     toast({
       title: "Removed from your cart.",
       description: "This item has been removed from your cart.",
@@ -40,9 +55,9 @@ export const removeFromShoppingCartItems = (
       duration: 2000,
       isClosable: true,
     });
+    return filteredCartItems;
   }
-
-  return filteredCartItems;
+  return updatedCartItems;
 };
 
 export const removeAndAllFromShoppingCartItems = (

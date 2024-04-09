@@ -1,12 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { ICart, IProduct } from "../../interfaces";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IProduct } from "../../interfaces";
 import { RootState } from "../store.";
 import {
   addToShoppingCartItems,
   removeAndAllFromShoppingCartItems,
   removeFromShoppingCartItems,
 } from "../../utils";
-import { getCart } from "../../api/cartApis";
 
 interface IInitialState {
   cartProduct: IProduct[];
@@ -15,14 +14,6 @@ interface IInitialState {
 const initialState: IInitialState = {
   cartProduct: [],
 };
-
-export const fetchCartData = createAsyncThunk(
-  "cart/fetchCartData",
-  async () => {
-    const response = await getCart();
-    return response.map((res: ICart) => res?.attributes?.products?.data[0]);
-  }
-);
 
 const cartSlice = createSlice({
   name: "cart",
@@ -46,11 +37,6 @@ const cartSlice = createSlice({
         state.cartProduct
       );
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(fetchCartData.fulfilled, (state, action) => {
-      state.cartProduct = action.payload;
-    });
   },
 });
 

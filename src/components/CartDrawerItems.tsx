@@ -1,7 +1,9 @@
 import {
   Button,
+  ButtonGroup,
   Divider,
   Flex,
+  IconButton,
   Image,
   Link,
   Stack,
@@ -9,13 +11,26 @@ import {
 } from "@chakra-ui/react";
 import { IProduct } from "../interfaces";
 import { Link as LinkRouter } from "react-router-dom";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, MinusIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { removeFromCart, selectCart } from "../app/features/cartSlice";
+import {
+  addToCart,
+  removeFromCart,
+  removeFromCartQuantity,
+  selectCart,
+} from "../app/features/cartSlice";
 
-const CartDrawerItems = ({ id, attributes }: IProduct) => {
+const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
   const { cartProduct } = useSelector(selectCart);
   const dispatch = useDispatch();
+  const quantityIncreaseHandler = (id: number) => {
+    const product = cartProduct.filter((item: IProduct) => item.id === id)[0];
+    dispatch(addToCart(product));
+  };
+  const quantityDecreaseHandler = (id: number) => {
+    const product = cartProduct.filter((item: IProduct) => item.id === id)[0];
+    dispatch(removeFromCartQuantity(product));
+  };
   const removeItemHandler = (id: number) => {
     const product = cartProduct.filter((item: IProduct) => item.id === id);
     dispatch(removeFromCart(Array.from(product)));
@@ -29,8 +44,8 @@ const CartDrawerItems = ({ id, attributes }: IProduct) => {
             boxSize={"80px"}
             rounded={"full"}
             objectFit={"cover"}
-            src={attributes?.thumbnail?.data?.attributes?.url}
-            alt={attributes?.thumbnail?.data?.attributes?.alternativeText}
+            src={attributes.thumbnail.data.attributes.url}
+            alt={attributes.thumbnail.data.attributes.alternativeText}
           />
         </Stack>
         <Flex flexDir={"column"} gap={"8px"} flexGrow={1}>
@@ -46,6 +61,22 @@ const CartDrawerItems = ({ id, attributes }: IProduct) => {
             </Link>
           </Stack>
           <Flex gap={"16px"} alignItems={"center"}>
+            <Flex gap={"8px"}>
+              <Text>Quantity:</Text>
+              <ButtonGroup isAttached size="sm" variant="outline">
+                <IconButton
+                  aria-label="Add to friends"
+                  icon={<MinusIcon />}
+                  onClick={() => quantityDecreaseHandler(id)}
+                />
+                <Button>{quantity}</Button>
+                <IconButton
+                  aria-label="Add to friends"
+                  icon={<AddIcon />}
+                  onClick={() => quantityIncreaseHandler(id)}
+                />
+              </ButtonGroup>
+            </Flex>
             <Text>
               Price: $
               {attributes.price && attributes.discountPercentage
@@ -67,9 +98,9 @@ const CartDrawerItems = ({ id, attributes }: IProduct) => {
               <Link
                 as={LinkRouter}
                 fontWeight={"semibold"}
-                to={`/categories/${attributes?.categories?.data[0]?.id}`}
+                to={`/categories/${attributes.categories.data[0].id}`}
               >
-                {attributes?.categories?.data[0]?.attributes?.title}
+                {attributes.categories.data[0].attributes.title}
               </Link>
             </Text>
             <Button
