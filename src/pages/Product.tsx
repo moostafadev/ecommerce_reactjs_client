@@ -31,6 +31,7 @@ import { axiosInstance } from "../api/axios.config";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../app/features/cartSlice";
 import cookieServices from "../services/cookieServices";
+import { postCart } from "../api/cartApis";
 
 const settings = {
   dots: true,
@@ -103,6 +104,10 @@ const ProductPage = () => {
 
   const addToCartHandler = () => {
     if (token) {
+      postCart({
+        products: product,
+        email: cookieServices.get("user").email,
+      });
       dispatch(addToCart(product));
     } else {
       navigate("/login");

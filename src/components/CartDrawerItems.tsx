@@ -20,7 +20,7 @@ import {
   selectCart,
 } from "../app/features/cartSlice";
 
-const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
+const CartDrawerItems = ({ id, attributes }: IProduct) => {
   const { cartProduct } = useSelector(selectCart);
   const dispatch = useDispatch();
   const quantityIncreaseHandler = (id: number) => {
@@ -44,8 +44,8 @@ const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
             boxSize={"80px"}
             rounded={"full"}
             objectFit={"cover"}
-            src={attributes.thumbnail.data.attributes.url}
-            alt={attributes.thumbnail.data.attributes.alternativeText}
+            src={attributes?.thumbnail?.data?.attributes?.url}
+            alt={attributes?.thumbnail?.data?.attributes?.alternativeText}
           />
         </Stack>
         <Flex flexDir={"column"} gap={"8px"} flexGrow={1}>
@@ -69,7 +69,7 @@ const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
                   icon={<MinusIcon />}
                   onClick={() => quantityDecreaseHandler(id)}
                 />
-                <Button>{quantity}</Button>
+                <Button>{attributes?.qty}</Button>
                 <IconButton
                   aria-label="Add to friends"
                   icon={<AddIcon />}
@@ -98,9 +98,9 @@ const CartDrawerItems = ({ id, quantity, attributes }: IProduct) => {
               <Link
                 as={LinkRouter}
                 fontWeight={"semibold"}
-                to={`/categories/${attributes.categories.data[0].id}`}
+                to={`/categories/${attributes?.categories?.data[0]?.id}`}
               >
-                {attributes.categories.data[0].attributes.title}
+                {attributes?.categories?.data[0]?.attributes?.title}
               </Link>
             </Text>
             <Button

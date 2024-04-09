@@ -15,16 +15,26 @@ import {
   OnCloseCartDrawerAction,
   selectGlobal,
 } from "../app/features/globalSlice";
-import React from "react";
-import { removeFromCart, selectCart } from "../app/features/cartSlice";
+import React, { useEffect } from "react";
+import {
+  fetchCartData,
+  removeFromCart,
+  selectCart,
+} from "../app/features/cartSlice";
 import CartDrawerItems from "./CartDrawerItems";
+import { AppDispatch } from "../app/store.";
 
 const CartDrawer = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { isOpenCartDrawer } = useSelector(selectGlobal);
   const { cartProduct } = useSelector(selectCart);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   const onClose = () => dispatch(OnCloseCartDrawerAction());
+
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+  console.log(cartProduct);
 
   const removeAllItemsHandler = () => {
     dispatch(removeFromCart(cartProduct));
@@ -33,16 +43,16 @@ const CartDrawer = () => {
     (item) =>
       item.attributes.price &&
       item.attributes.discountPercentage &&
-      item.quantity &&
+      item.attributes.qty &&
       Math.ceil(
         (item.attributes.price - item.attributes.discountPercentage) *
-          item.quantity
+          item.attributes.qty
       )
   );
   const countPrices =
     prices.length && prices.reduce((prev, cur) => prev && cur && prev + cur);
 
-  const items = cartProduct.map((item) => item.quantity);
+  const items = cartProduct.map((item) => item.attributes.qty);
   const countItems =
     items.length && items.reduce((prev, cur) => prev && cur && prev + cur);
 
@@ -64,7 +74,6 @@ const CartDrawer = () => {
               key={idx}
               id={item.id}
               attributes={item.attributes}
-              quantity={item.quantity}
             />
           ))}
         </DrawerBody>

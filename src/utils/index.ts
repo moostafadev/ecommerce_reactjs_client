@@ -18,8 +18,14 @@ export const addToShoppingCartItems = (
       isClosable: true,
     });
     return shoppingCartItems.map((item) =>
-      item.id === cartItem.id && item.quantity
-        ? { ...item, quantity: item.quantity + 1 }
+      item.id === cartItem.id && item.attributes.qty
+        ? {
+            ...item,
+            attributes: {
+              ...item.attributes,
+              qty: item.attributes.qty + 1,
+            },
+          }
         : item
     );
   }
@@ -29,7 +35,16 @@ export const addToShoppingCartItems = (
     duration: 2000,
     isClosable: true,
   });
-  return [...shoppingCartItems, { ...cartItem, quantity: 1 }];
+  return [
+    ...shoppingCartItems,
+    {
+      ...cartItem,
+      attributes: {
+        ...cartItem.attributes,
+        qty: 1,
+      },
+    },
+  ];
 };
 
 export const removeFromShoppingCartItems = (
@@ -37,12 +52,18 @@ export const removeFromShoppingCartItems = (
   shoppingCartItems: IProduct[]
 ) => {
   const updatedCartItems = shoppingCartItems.map((item) =>
-    item.id === cartItem.id && item.quantity
-      ? { ...item, quantity: item.quantity - 1 }
+    item.id === cartItem.id && item.attributes.qty
+      ? {
+          ...item,
+          attributes: {
+            ...item.attributes,
+            qty: item.attributes.qty - 1,
+          },
+        }
       : item
   );
   const itemToRemove = updatedCartItems.find(
-    (item) => item.id === cartItem.id && item.quantity === 0
+    (item) => item.id === cartItem.id && item.attributes.qty === 0
   );
   if (itemToRemove) {
     const filteredCartItems = updatedCartItems.filter(

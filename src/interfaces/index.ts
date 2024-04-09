@@ -45,11 +45,11 @@ export interface ICategory {
 }
 
 export interface IProduct {
-  quantity?: number;
   typeData?: "product" | "category";
   id: number;
   category?: ICategory;
   attributes: {
+    qty?: number;
     brand?: string;
     description: string;
     discountPercentage?: number;
@@ -72,4 +72,9 @@ export interface IProduct {
 export interface IUser {
   identifier: string;
   password: string;
+}
+
+export interface ICart {
+  id: number;
+  attributes: { email: string; products: { data: IProduct[] } };
 }
