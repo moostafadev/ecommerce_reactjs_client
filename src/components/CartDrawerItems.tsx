@@ -1,9 +1,7 @@
 import {
   Button,
-  ButtonGroup,
   Divider,
   Flex,
-  IconButton,
   Image,
   Link,
   Stack,
@@ -11,26 +9,13 @@ import {
 } from "@chakra-ui/react";
 import { IProduct } from "../interfaces";
 import { Link as LinkRouter } from "react-router-dom";
-import { AddIcon, DeleteIcon, MinusIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  removeFromCart,
-  removeFromCartQuantity,
-  selectCart,
-} from "../app/features/cartSlice";
+import { removeFromCart, selectCart } from "../app/features/cartSlice";
 
 const CartDrawerItems = ({ id, attributes }: IProduct) => {
   const { cartProduct } = useSelector(selectCart);
   const dispatch = useDispatch();
-  const quantityIncreaseHandler = (id: number) => {
-    const product = cartProduct.filter((item: IProduct) => item.id === id)[0];
-    dispatch(addToCart(product));
-  };
-  const quantityDecreaseHandler = (id: number) => {
-    const product = cartProduct.filter((item: IProduct) => item.id === id)[0];
-    dispatch(removeFromCartQuantity(product));
-  };
   const removeItemHandler = (id: number) => {
     const product = cartProduct.filter((item: IProduct) => item.id === id);
     dispatch(removeFromCart(Array.from(product)));
@@ -61,22 +46,6 @@ const CartDrawerItems = ({ id, attributes }: IProduct) => {
             </Link>
           </Stack>
           <Flex gap={"16px"} alignItems={"center"}>
-            <Flex gap={"8px"}>
-              <Text>Quantity:</Text>
-              <ButtonGroup isAttached size="sm" variant="outline">
-                <IconButton
-                  aria-label="Add to friends"
-                  icon={<MinusIcon />}
-                  onClick={() => quantityDecreaseHandler(id)}
-                />
-                <Button>{attributes?.qty}</Button>
-                <IconButton
-                  aria-label="Add to friends"
-                  icon={<AddIcon />}
-                  onClick={() => quantityIncreaseHandler(id)}
-                />
-              </ButtonGroup>
-            </Flex>
             <Text>
               Price: $
               {attributes.price && attributes.discountPercentage

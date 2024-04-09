@@ -34,7 +34,6 @@ const CartDrawer = () => {
   useEffect(() => {
     dispatch(fetchCartData());
   }, [dispatch]);
-  console.log(cartProduct);
 
   const removeAllItemsHandler = () => {
     dispatch(removeFromCart(cartProduct));
@@ -43,18 +42,10 @@ const CartDrawer = () => {
     (item) =>
       item.attributes.price &&
       item.attributes.discountPercentage &&
-      item.attributes.qty &&
-      Math.ceil(
-        (item.attributes.price - item.attributes.discountPercentage) *
-          item.attributes.qty
-      )
+      Math.ceil(item.attributes.price - item.attributes.discountPercentage)
   );
   const countPrices =
     prices.length && prices.reduce((prev, cur) => prev && cur && prev + cur);
-
-  const items = cartProduct.map((item) => item.attributes.qty);
-  const countItems =
-    items.length && items.reduce((prev, cur) => prev && cur && prev + cur);
 
   return (
     <Drawer
@@ -84,8 +75,10 @@ const CartDrawer = () => {
               <Flex flexDir={"column"} gap={"8px"}>
                 <Text>All price: ${countPrices} USD</Text>
                 <Text>
-                  Quantity items: {countItems}{" "}
-                  {countItems && countItems < 2 ? "Item" : "Items"}
+                  Quantity items: {cartProduct.length}{" "}
+                  {cartProduct.length && cartProduct.length < 2
+                    ? "Item"
+                    : "Items"}
                 </Text>
               </Flex>
               <Button

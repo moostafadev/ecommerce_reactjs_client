@@ -49,7 +49,6 @@ export interface IProduct {
   id: number;
   category?: ICategory;
   attributes: {
-    qty?: number;
     brand?: string;
     description: string;
     discountPercentage?: number;
