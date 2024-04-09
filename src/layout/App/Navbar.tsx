@@ -204,7 +204,7 @@ const Navbar = () => {
                         </Center>
                         <br />
                         <Center>
-                          <p>{user?.username}</p>
+                          <p>{user.username}</p>
                         </Center>
                         <br />
                         <MenuDivider />

@@ -90,7 +90,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
         expires: date,
       };
       cookieServices.set("jwt", userData.jwt, options);
-      cookieServices.set("user", meData, options);
+      cookieServices.set("user", meData);
       if (status === 200 && statusMe === 200) {
         toast({
           title: "Login Successful",
