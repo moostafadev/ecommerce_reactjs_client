@@ -42,12 +42,8 @@ const ProductsPage = () => {
   if (error) return <h3>{error.message}</h3>;
 
   return (
-    <Container maxW={MAX_WIDTH_CONTAINER}>
-      <Grid
-        marginY={30}
-        templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
-        gap={"3"}
-      >
+    <Container maxW={MAX_WIDTH_CONTAINER} minH="calc(100vh - 128px)" py="16px">
+      <Grid templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"} gap={"3"}>
         {Array.isArray(data?.data?.data) &&
           data.data.data.map((product: IProduct) => (
             <MainCard

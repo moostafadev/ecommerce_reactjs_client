@@ -22,6 +22,7 @@ import {
   MenuItem,
   MenuList,
   useColorMode,
+  Button,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
 import { IconType } from "react-icons";
@@ -29,6 +30,7 @@ import { Link, Outlet } from "react-router-dom";
 import { FaTableCells } from "react-icons/fa6";
 import { BiSolidCategory } from "react-icons/bi";
 import { FaUsers } from "react-icons/fa";
+import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 interface LinkItemProps {
   name: string;
@@ -134,6 +136,7 @@ const NavItem = ({ icon, to, children, ...rest }: NavItemProps) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -162,24 +165,26 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       >
         Logo
       </Text>
-
-      <HStack spacing={{ base: "0", md: "6" }}>
+      <HStack spacing={{ base: "2", md: "6" }}>
         <IconButton
           size="lg"
           variant="ghost"
           aria-label="open menu"
           icon={<FiBell />}
         />
+        <Button
+          onClick={toggleColorMode}
+          padding={{ base: "0px", md: "16px" }}
+          size="lg"
+          variant="ghost"
+        >
+          {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+        </Button>
         <Flex alignItems={"center"}>
           <Menu>
-            <MenuButton
-              py={2}
-              transition="all 0.3s"
-              _focus={{ boxShadow: "none" }}
-            >
+            <MenuButton transition="all 0.3s" _focus={{ boxShadow: "none" }}>
               <HStack>
                 <Avatar
-                  size={"sm"}
                   src={
                     "https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
                   }

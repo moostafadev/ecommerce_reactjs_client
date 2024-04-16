@@ -9,10 +9,16 @@ import {
   Tfoot,
   Image,
   Button,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { FaRegEdit, FaRegEye, FaTrashAlt } from "react-icons/fa";
 import { ICategory, IProduct } from "../interfaces";
 import { Link } from "react-router-dom";
+import AlertDialogC from "./AlartDialog";
+import { axiosInstance } from "../api/axios.config";
+import { useState } from "react";
+import cookieServices from "../services/cookieServices";
 
 interface IProps {
   tHeadData: string[];
@@ -21,6 +27,43 @@ interface IProps {
 }
 
 const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [id, setId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onDelete = async () => {
+    if (id) {
+      setIsLoading(true);
+      try {
+        const res = await axiosInstance.delete(
+          `/${isProduct ? "products" : "categories"}/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookieServices.get("jwt")}`,
+            },
+          }
+        );
+        console.log(res);
+        setId(null);
+        onClose();
+        toast({
+          title: "Deleted Successful",
+          status: "success",
+          duration: 1000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
   const getUniqueBrands = (category: ICategory) => {
     const brands: string[] = [];
     category.attributes.products?.data.forEach((product) => {
@@ -87,8 +130,10 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
               rounded={"100%"}
               mx={"auto"}
               objectFit={"cover"}
-              src={item.attributes.thumbnail.data.attributes.url}
-              alt={item.attributes.thumbnail.data.attributes.alternativeText}
+              src={item?.attributes?.thumbnail?.data?.attributes?.url}
+              alt={
+                item?.attributes?.thumbnail?.data?.attributes?.alternativeText
+              }
             />
           </Td>
           <Td textAlign={"center"}>
@@ -104,7 +149,14 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
             <Button colorScheme="blue" size={"sm"} mr={"4px"}>
               <FaRegEdit />
             </Button>
-            <Button colorScheme="red" size={"sm"}>
+            <Button
+              colorScheme="red"
+              size={"sm"}
+              onClick={() => {
+                setId(item.id);
+                onOpen();
+              }}
+            >
               <FaTrashAlt />
             </Button>
           </Td>
@@ -120,29 +172,38 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
   };
 
   return (
-    <TableContainer>
-      <Table size="sm">
-        <Thead>
-          <Tr>
-            {tHeadData.map((th, index) => (
-              <Th key={index} textAlign={"center"}>
-                {th}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>{renderBody()}</Tbody>
-        <Tfoot>
-          <Tr>
-            {tHeadData.map((th, index) => (
-              <Th key={index} textAlign={"center"}>
-                {th}
-              </Th>
-            ))}
-          </Tr>
-        </Tfoot>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <Table size="sm">
+          <Thead>
+            <Tr>
+              {tHeadData.map((th, index) => (
+                <Th key={index} textAlign={"center"}>
+                  {th}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>{renderBody()}</Tbody>
+          <Tfoot>
+            <Tr>
+              {tHeadData.map((th, index) => (
+                <Th key={index} textAlign={"center"}>
+                  {th}
+                </Th>
+              ))}
+            </Tr>
+          </Tfoot>
+        </Table>
+      </TableContainer>
+      <AlertDialogC
+        isOpen={isOpen}
+        onClose={onClose}
+        onDelete={onDelete}
+        isLoading={isLoading}
+        title={isProduct ? "Delete product" : "Delete category"}
+      />
+    </>
   );
 };
 
