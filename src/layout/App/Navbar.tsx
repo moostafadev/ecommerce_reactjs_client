@@ -34,6 +34,8 @@ import { BsCart } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCart } from "../../app/features/cartSlice";
 import { OnOpenCartDrawerAction } from "../../app/features/globalSlice";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../../api/axios.config";
 
 interface Props {
   children: React.ReactNode;
@@ -118,6 +120,23 @@ const Navbar = () => {
     }, 500);
   };
 
+  const getUser = async () => {
+    const res = await axiosInstance.get(
+      `/users/${cookieServices.get("user").id}?populate=*`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookieServices.get("jwt")}`,
+        },
+      }
+    );
+    return res;
+  };
+
+  const { data } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUser,
+  });
+
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")}>
@@ -188,7 +207,9 @@ const Navbar = () => {
                         <Avatar
                           size={"sm"}
                           src={
-                            "https://avatars.dicebear.com/api/male/username.svg"
+                            data?.data?.image?.url
+                              ? data?.data?.image?.url
+                              : "../../src/assets/User_not_found.jpg"
                           }
                         />
                       </MenuButton>
@@ -198,7 +219,9 @@ const Navbar = () => {
                           <Avatar
                             size={"2xl"}
                             src={
-                              "https://avatars.dicebear.com/api/male/username.svg"
+                              data?.data?.image?.url
+                                ? data?.data?.image?.url
+                                : "../../src/assets/User_not_found.jpg"
                             }
                           />
                         </Center>
@@ -208,7 +231,12 @@ const Navbar = () => {
                         </Center>
                         <br />
                         <MenuDivider />
-                        <MenuItem>Profile</MenuItem>
+                        <MenuItem
+                          as={Link}
+                          to={`/profiles/${cookieServices.get("user").id}`}
+                        >
+                          Profile
+                        </MenuItem>
                         <MenuItem
                           color={"red.500"}
                           fontWeight={"semibold"}
