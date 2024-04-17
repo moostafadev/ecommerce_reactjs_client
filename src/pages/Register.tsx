@@ -29,14 +29,16 @@ interface IErrorResponse {
   };
 }
 
-const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
+const RegisterPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser>({
-    identifier: "",
+    username: "",
+    email: "",
     password: "",
   });
+  const [isUsername, setIsUsername] = useState(false);
   const [isEmail, setIsEmail] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -48,20 +50,26 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
 
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    const { identifier: email, password } = user;
-    if (!email && !password) {
+    const { username, email, password } = user;
+    if (!username && !email && !password) {
+      setIsUsername(true);
       setIsEmail(true);
       setIsPassword(true);
+      return;
+    }
+    if (!username || username.length < 3) {
+      setIsUsername(true);
       return;
     }
     if (!email) {
       setIsEmail(true);
       return;
     }
-    if (!password) {
+    if (!password || password.length < 6) {
       setIsPassword(true);
       return;
     }
+    setIsUsername(false);
     setIsEmail(false);
     setIsPassword(false);
     onSubmit();
@@ -71,7 +79,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
     setIsLoading(true);
     try {
       const { status, data: userData } = await axiosInstance.post(
-        "/auth/local",
+        "/auth/local/register",
         user
       );
       const { status: statusMe, data: meData } = await axiosInstance.get(
@@ -94,8 +102,8 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
       cookieServices.set("user", meData, options);
       if (status === 200 && statusMe === 200) {
         toast({
-          title: "Login Successful",
-          description: "Welcome back! You have successfully logged in.",
+          title: "Register Successful",
+          description: "Welcome back! You have account successfully.",
           status: "success",
           duration: 1000,
           isClosable: true,
@@ -109,7 +117,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
       toast({
         title: errorObj.response?.data.error.message,
         description:
-          "Unable to log in. Please double-check your email and password and try again.",
+          "Unable to log in. Please double-check your username, email and password and try again.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -140,7 +148,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
       >
         <Stack align={"center"}>
           <Heading fontSize={"4xl"} textAlign={"center"}>
-            Sign in to your account
+            Sign up to create account
           </Heading>
         </Stack>
         <Box
@@ -153,12 +161,27 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
         >
           <Stack spacing={4}>
             <FormControl id="email">
+              <FormLabel>Username</FormLabel>
+              <Input
+                type="text"
+                value={user.username}
+                onChange={onChangeHandler}
+                name="username"
+                isInvalid={isUsername}
+              />
+              {isUsername && (
+                <FormHelperText color={"red.400"}>
+                  Username is required and min letters 3!
+                </FormHelperText>
+              )}
+            </FormControl>
+            <FormControl id="email">
               <FormLabel>Email address</FormLabel>
               <Input
                 type="email"
-                value={user.identifier}
+                value={user.email}
                 onChange={onChangeHandler}
-                name="identifier"
+                name="email"
                 isInvalid={isEmail}
               />
               {isEmail && (
@@ -190,7 +213,7 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
               </InputGroup>
               {isPassword && (
                 <FormHelperText color={"red.400"}>
-                  Password is required!
+                  Password is required and min letters 6!
                 </FormHelperText>
               )}
             </FormControl>
@@ -217,15 +240,15 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
             </Stack>
             <Stack pt={6}>
               <Text align={"center"}>
-                Not have account?{" "}
+                Already a user?{" "}
                 <Text
                   as={Link}
-                  to={"/register"}
+                  to={"/login"}
                   color={"blue.400"}
                   fontSize={"18px"}
                   fontWeight={"semibold"}
                 >
-                  register
+                  Login
                 </Text>
               </Text>
             </Stack>
@@ -236,4 +259,4 @@ const LoginPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

@@ -70,7 +70,9 @@ export interface IProduct {
 }
 
 export interface IUser {
-  identifier: string;
+  username?: string;
+  identifier?: string;
+  email?: string;
   password: string;
 }
 

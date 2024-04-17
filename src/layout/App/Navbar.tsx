@@ -116,7 +116,7 @@ const Navbar = () => {
       isClosable: true,
     });
     setTimeout(() => {
-      window.location.reload();
+      window.location.replace("/");
     }, 500);
   };
 

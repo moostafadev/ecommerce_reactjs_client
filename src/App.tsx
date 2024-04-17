@@ -13,6 +13,7 @@ import ProductsDashboardPage from "./pages/Dashboard/Products";
 import CategoriesDashboardPage from "./pages/Dashboard/Categories";
 import UsersDashboardPage from "./pages/Dashboard/Users";
 import ProfilePage from "./pages/Profile";
+import RegisterPage from "./pages/Register";
 
 function App() {
   const token: string = cookieServices.get("jwt");
@@ -37,6 +38,10 @@ function App() {
           <Route
             path="profiles/:id"
             element={<ProfilePage isAuthantecated={token} />}
+          />
+          <Route
+            path="register"
+            element={<RegisterPage isAuthantecated={token} />}
           />
           <Route path="login" element={<LoginPage isAuthantecated={token} />} />
         </Route>
