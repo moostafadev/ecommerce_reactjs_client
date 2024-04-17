@@ -23,6 +23,7 @@ import {
   MenuList,
   useColorMode,
   Button,
+  useToast,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
 import { IconType } from "react-icons";
@@ -31,6 +32,7 @@ import { FaTableCells } from "react-icons/fa6";
 import { BiSolidCategory } from "react-icons/bi";
 import { FaUsers } from "react-icons/fa";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import cookieServices from "../../services/cookieServices";
 
 interface LinkItemProps {
   name: string;
@@ -136,7 +138,23 @@ const NavItem = ({ icon, to, children, ...rest }: NavItemProps) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
+
+  const handleLogout = () => {
+    cookieServices.remove("jwt");
+    cookieServices.remove("user");
+    toast({
+      title: "Logout Successful",
+      status: "success",
+      duration: 500,
+      isClosable: true,
+    });
+    setTimeout(() => {
+      window.location.replace("/");
+    }, 500);
+  };
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -184,18 +202,16 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           <Menu>
             <MenuButton transition="all 0.3s" _focus={{ boxShadow: "none" }}>
               <HStack>
-                <Avatar
-                  src={
-                    "https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
-                  }
-                />
+                <Avatar src={"../../assets/User_not_found.jpg"} />
                 <VStack
                   display={{ base: "none", md: "flex" }}
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">Justina Clark</Text>
+                  <Text fontSize="sm">
+                    {cookieServices.get("user").username}
+                  </Text>
                   <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
@@ -212,7 +228,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Profile</MenuItem>
               <MenuItem>Settings</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={handleLogout}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

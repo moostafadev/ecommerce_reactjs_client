@@ -22,9 +22,9 @@ const ProductsDashboardPage = () => {
     "Price discount",
     "Discount",
     "Brand",
-    "Thumbnail",
     "Stock",
     "Rating",
+    "Thumbnail",
     "Actions",
   ];
 
