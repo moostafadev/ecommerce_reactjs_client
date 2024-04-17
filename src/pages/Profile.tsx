@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   Flex,
   Heading,
@@ -12,6 +13,7 @@ import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import { axiosInstance } from "../api/axios.config";
 import cookieServices from "../services/cookieServices";
 import { useQuery } from "@tanstack/react-query";
+import { IUserData } from "../interfaces";
 
 const ProfilePage = ({ isAuthantecated }: { isAuthantecated: string }) => {
   const { colorMode } = useColorMode();
@@ -31,7 +33,7 @@ const ProfilePage = ({ isAuthantecated }: { isAuthantecated: string }) => {
     queryFn: getUser,
   });
 
-  const user = data?.data;
+  const user: IUserData = data?.data;
 
   if (isLoading) {
     return <Text>Loading ...</Text>;
@@ -95,6 +97,9 @@ const ProfilePage = ({ isAuthantecated }: { isAuthantecated: string }) => {
             </Flex>
           </Box>
         </Flex>
+        <Button onClick={() => history.back()} colorScheme="orange" mt={"16px"}>
+          Back
+        </Button>
       </Box>
     </Container>
   );

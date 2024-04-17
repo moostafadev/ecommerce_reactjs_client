@@ -73,3 +73,16 @@ export interface IUser {
   identifier: string;
   password: string;
 }
+
+export interface IUserData {
+  id: number;
+  username: string;
+  email: string;
+  createdAt: string;
+  role: {
+    name: string;
+  };
+  image: {
+    url: string;
+  };
+}

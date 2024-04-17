@@ -36,7 +36,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     if (id) {
       setIsLoading(true);
       try {
-        const res = await axiosInstance.delete(
+        await axiosInstance.delete(
           `/${isProduct ? "products" : "categories"}/${id}`,
           {
             headers: {
@@ -44,7 +44,6 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
             },
           }
         );
-        console.log(res);
         setId(null);
         onClose();
         toast({
