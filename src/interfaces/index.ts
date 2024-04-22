@@ -1,4 +1,5 @@
 export interface IImage {
+  id: number;
   attributes: {
     url: string;
     alternativeText: string;

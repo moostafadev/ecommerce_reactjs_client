@@ -250,7 +250,9 @@ const ProductPage = () => {
                   product?.attributes?.discountPercentage
                     ? Math.ceil(
                         product?.attributes?.price -
-                          product?.attributes?.discountPercentage
+                          (product?.attributes?.price *
+                            product?.attributes?.discountPercentage) /
+                            100
                       )
                     : product?.attributes?.price &&
                       Math.ceil(product?.attributes?.price)}{" "}

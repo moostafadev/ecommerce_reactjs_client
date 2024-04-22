@@ -48,7 +48,9 @@ const MainCard = ({ id, attributes, category, typeData }: IProduct) => {
                   $
                   {attributes?.price && attributes?.discountPercentage
                     ? Math.ceil(
-                        attributes?.price - attributes?.discountPercentage
+                        attributes?.price -
+                          (attributes?.price * attributes?.discountPercentage) /
+                            100
                       )
                     : attributes?.price && Math.ceil(attributes?.price)}
                 </Text>
