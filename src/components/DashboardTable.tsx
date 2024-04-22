@@ -56,6 +56,8 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
   const [images, setImages] = useState<FileList | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<string[] | null>(null);
+  const [hiddenImageIds, setHiddenImageIds] = useState<number[]>([]);
+  const [isLoadingRemove, setIsLoadingRemove] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasDiscount, setHasDiscount] = useState("no");
 
@@ -239,6 +241,22 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     }
   };
 
+  const removeImgHandler = async (id: number) => {
+    try {
+      setIsLoadingRemove(true);
+      await axiosInstance.delete(`/upload/files/${id}`, {
+        headers: {
+          Authorization: `Bearer ${cookieServices.get("jwt")}`,
+        },
+      });
+      setHiddenImageIds((prevIds) => [...prevIds, id]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingRemove(false);
+    }
+  };
+
   const renderBody = () => {
     if (Array.isArray(data) && data.length > 0) {
       return data.map((item, index) => (
@@ -256,10 +274,10 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                 (item as IProduct).attributes.discountPercentage
                   ? Math.ceil(
                       ((item as IProduct)?.attributes?.price ?? 0) -
-                        ((((item as IProduct)?.attributes?.price ?? 1) *
+                        (((item as IProduct)?.attributes?.price ?? 1) *
                           ((item as IProduct)?.attributes?.discountPercentage ??
                             1)) /
-                          100 ?? 0)
+                          100
                     )
                   : (item as IProduct).attributes?.price &&
                     Math.ceil((item as IProduct).attributes.price ?? 0)}{" "}
@@ -591,6 +609,13 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                         p={"4px"}
                         rounded={"md"}
                         bg={colorMode === "dark" ? "gray.800" : "gray.200"}
+                        position={"relative"}
+                        display={
+                          hiddenImageIds.includes(img.id) ? "none" : "block"
+                        }
+                        _hover={{
+                          "& > div": { display: "flex" },
+                        }}
                       >
                         <Image
                           rounded={"md"}
@@ -600,6 +625,37 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                           w={"100%"}
                           h={"100%"}
                         />
+                        <Box
+                          position={"absolute"}
+                          left={"50%"}
+                          top={"50%"}
+                          transform={"translate(-50%, -50%)"}
+                          w={"100%"}
+                          h={"100%"}
+                          rounded={"md"}
+                          display={"none"}
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                        >
+                          <Box
+                            w={"100%"}
+                            h={"100%"}
+                            rounded={"md"}
+                            backdropFilter={"blur(5px)"}
+                            position={"absolute"}
+                            zIndex={"-1"}
+                          ></Box>
+                          <Button
+                            isLoading={isLoadingRemove}
+                            variant={"outline"}
+                            p={"12px 0"}
+                            fontSize={"30px"}
+                            cursor={"pointer"}
+                            onClick={() => removeImgHandler(img.id)}
+                          >
+                            <FaTrashAlt />
+                          </Button>
+                        </Box>
                       </Box>
                     ))}
                   </Grid>
