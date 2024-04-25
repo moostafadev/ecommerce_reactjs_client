@@ -293,7 +293,6 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
               ) : (
                 <Td textAlign={"center"}>Not discount</Td>
               )}
-
               <Td textAlign={"center"}>
                 {(item as IProduct).attributes.brand}
               </Td>

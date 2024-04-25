@@ -14,7 +14,7 @@ interface IProps {
   isOpen: boolean;
   onClose: () => void;
   clickHandler: () => void;
-  isLoading: boolean;
+  isLoading?: boolean;
   title: string;
   okBtn?: string;
   cancelBtn?: string;
