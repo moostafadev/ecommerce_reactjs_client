@@ -323,11 +323,11 @@ const ProductsDashboardPage = () => {
               placeholder="Choose category"
               onChange={onChangeCategoryHandler}
               value={
-                dataProduct?.attributes.categories.data[0].attributes?.title
+                dataProduct?.attributes.categories.data[0]?.attributes?.title
               }
             >
               {dataProduct &&
-                categoriesData.map((item: ICategory, idx: number) => (
+                categoriesData?.map((item: ICategory, idx: number) => (
                   <option key={idx} value={item.attributes.title}>
                     {item.attributes.title}
                   </option>

@@ -82,6 +82,27 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
       },
     },
   };
+  const defaultCategory = {
+    id: 0,
+    attributes: {
+      title: "",
+      description: "",
+      thumbnail: {
+        data: { id: 0, attributes: { alternativeText: "", url: "" } },
+      },
+      categories: {
+        data: [
+          {
+            id: 0,
+            attributes: {
+              title: "",
+              description: "",
+            },
+          },
+        ],
+      },
+    },
+  };
 
   const getCategories = async () => {
     const res = await axiosInstance.get(`/categories?populate=*`);
@@ -102,6 +123,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     onClose: onModalClose,
   } = useDisclosure();
   const [dataProduct, setDataProduct] = useState<IProduct>(defaultProduct);
+  const [dataCategory, setDataCategory] = useState<ICategory>(defaultCategory);
   const [thumbnail, setThumbnail] = useState<FileList | null>(null);
   const [images, setImages] = useState<FileList | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -127,37 +149,6 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
   }, [dataProduct, images, thumbnail]);
 
   // Handlers
-  const onDelete = async () => {
-    if (dataProduct) {
-      setIsLoading(true);
-      try {
-        await axiosInstance.delete(
-          `/${isProduct ? "products" : "categories"}/${dataProduct.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookieServices.get("jwt")}`,
-            },
-          }
-        );
-        setDataProduct(defaultProduct);
-        onClose();
-        toast({
-          title: "Deleted Successful",
-          status: "success",
-          duration: 1000,
-          isClosable: true,
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
   const getUniqueBrands = (category: ICategory) => {
     const brands: string[] = [];
     category.attributes.products?.data.forEach((product) => {
@@ -235,6 +226,51 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
       console.log(error);
     } finally {
       setIsLoadingRemove(false);
+    }
+  };
+
+  const onDelete = async () => {
+    if (dataProduct || dataCategory) {
+      setIsLoading(true);
+      try {
+        await axiosInstance.delete(
+          `/${isProduct ? "products" : "categories"}/${
+            isProduct ? dataProduct.id : dataCategory.id
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookieServices.get("jwt")}`,
+            },
+          }
+        );
+        if (dataCategory.attributes.products?.data.length) {
+          const data = dataCategory?.attributes?.products?.data;
+          console.log(data);
+          for (let i = 0; i < data?.length; i++) {
+            await axiosInstance.delete(`/products/${data[i].id}`, {
+              headers: {
+                Authorization: `Bearer ${cookieServices.get("jwt")}`,
+              },
+            });
+          }
+        }
+        setDataProduct(defaultProduct);
+        setDataCategory(defaultCategory);
+        onClose();
+        toast({
+          title: "Deleted Successful",
+          status: "success",
+          duration: 1000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -348,7 +384,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
           {isProduct ? (
             <>
               <Td textAlign={"center"}>
-                {item.attributes.categories.data[0].attributes.title}
+                {item.attributes.categories.data[0]?.attributes?.title}
               </Td>
               <Td textAlign={"center"}>
                 $
@@ -437,7 +473,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
               colorScheme="red"
               size={"sm"}
               onClick={() => {
-                setDataProduct(item);
+                if (isProduct) {
+                  setDataProduct(item);
+                } else {
+                  setDataCategory(item);
+                }
                 onOpen();
               }}
             >
@@ -532,7 +572,8 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                 <Select
                   onChange={onChangeCategoryHandler}
                   value={
-                    dataProduct?.attributes.categories.data[0].attributes.title
+                    dataProduct?.attributes.categories.data[0]?.attributes
+                      ?.title
                   }
                 >
                   {dataProduct &&
@@ -604,7 +645,6 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                 mt={4}
                 onChange={(e) => {
                   setHasDiscount(e);
-                  console.log(e);
                   if (dataProduct) {
                     setDataProduct({
                       ...dataProduct,
