@@ -26,6 +26,7 @@ import {
   InputRightAddon,
   Grid,
   useColorMode,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { FaRegEdit, FaRegEye, FaTrashAlt } from "react-icons/fa";
 import { ICategories, ICategory, IProduct } from "../interfaces";
@@ -35,6 +36,7 @@ import { axiosInstance } from "../api/axios.config";
 import { useEffect, useState } from "react";
 import cookieServices from "../services/cookieServices";
 import ModalCustom from "./ModalCustom";
+import { useQuery } from "@tanstack/react-query";
 
 interface IProps {
   tHeadData: string[];
@@ -43,15 +45,63 @@ interface IProps {
 }
 
 const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
-  const { colorMode } = useColorMode();
+  const defaultProduct = {
+    id: 0,
+    attributes: {
+      title: "",
+      description: "",
+      brand: "",
+      discountPercentage: 0,
+      price: 0,
+      rating: 0,
+      stock: 0,
+      categories: {
+        data: [
+          {
+            id: 0,
+            attributes: {
+              title: "",
+              description: "",
+            },
+          },
+        ],
+      },
+      images: {
+        data: [
+          {
+            id: 0,
+            attributes: {
+              alternativeText: "",
+              url: "",
+            },
+          },
+        ],
+      },
+      thumbnail: {
+        data: { id: 0, attributes: { alternativeText: "", url: "" } },
+      },
+    },
+  };
+
+  const getCategories = async () => {
+    const res = await axiosInstance.get(`/categories?populate=*`);
+    return res;
+  };
+  const { data: dataCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
+  const categoriesData: ICategory[] = dataCategories?.data?.data;
+
   const toast = useToast();
+  const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isModalOpen,
     onOpen: onModalOpen,
     onClose: onModalClose,
   } = useDisclosure();
-  const [dataProduct, setDataProduct] = useState<IProduct | null>(null);
+  const [dataProduct, setDataProduct] = useState<IProduct>(defaultProduct);
   const [thumbnail, setThumbnail] = useState<FileList | null>(null);
   const [images, setImages] = useState<FileList | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -60,6 +110,12 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
   const [isLoadingRemove, setIsLoadingRemove] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasDiscount, setHasDiscount] = useState("no");
+  // Validation
+  const [isTitle, setIsTitle] = useState(false);
+  const [isDescription, setIsDescription] = useState(false);
+  const [isBrand, setIsBrand] = useState(false);
+  const [isStock, setIsStock] = useState(false);
+  const [isPrice, setIsPrice] = useState(false);
 
   useEffect(() => {
     setHasDiscount(
@@ -70,6 +126,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     );
   }, [dataProduct, images, thumbnail]);
 
+  // Handlers
   const onDelete = async () => {
     if (dataProduct) {
       setIsLoading(true);
@@ -82,7 +139,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
             },
           }
         );
-        setDataProduct(null);
+        setDataProduct(defaultProduct);
         onClose();
         toast({
           title: "Deleted Successful",
@@ -110,17 +167,6 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
       }
     });
     return brands.join(", ");
-  };
-
-  const filteredCategory = () => {
-    const categories = data.map(
-      (item: IProduct) => item.attributes.categories.data[0]
-    );
-    const uniqueCategories = categories.filter(
-      (category, index, self) =>
-        index === self.findIndex((c) => c.id === category.id)
-    );
-    return uniqueCategories;
   };
 
   const onChangeTextHandler = (
@@ -165,7 +211,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
             ...dataProduct?.attributes.categories,
             data: [
               {
-                ...filteredCategory().filter(
+                ...categoriesData.filter(
                   (category) => category.attributes.title === value
                 )[0],
               },
@@ -176,7 +222,58 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     }
   };
 
+  const removeImgHandler = async (id: number) => {
+    try {
+      setIsLoadingRemove(true);
+      await axiosInstance.delete(`/upload/files/${id}`, {
+        headers: {
+          Authorization: `Bearer ${cookieServices.get("jwt")}`,
+        },
+      });
+      setHiddenImageIds((prevIds) => [...prevIds, id]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingRemove(false);
+    }
+  };
+
   const onClickEditHandler = async () => {
+    // Valication
+    const { title, description, brand, stock, price } = dataProduct.attributes;
+    if (!title && !description && !brand && !stock && !price) {
+      setIsTitle(true);
+      setIsDescription(true);
+      if (isProduct) {
+        setIsBrand(true);
+        setIsStock(true);
+        setIsPrice(true);
+        return;
+      }
+      return;
+    }
+    if (!title) {
+      setIsTitle(true);
+      return;
+    }
+    if (!description) {
+      setIsDescription(true);
+      return;
+    }
+    if (isProduct) {
+      if (!brand) {
+        setIsBrand(true);
+        return;
+      }
+      if (!stock) {
+        setIsStock(true);
+        return;
+      }
+      if (!price) {
+        setIsPrice(true);
+        return;
+      }
+    }
     const formData = new FormData();
     if (dataProduct) {
       setIsLoading(true);
@@ -222,7 +319,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
             },
           }
         );
-        setDataProduct(null);
+        setDataProduct(defaultProduct);
         onModalClose();
         toast({
           title: "Edit Successful",
@@ -241,22 +338,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     }
   };
 
-  const removeImgHandler = async (id: number) => {
-    try {
-      setIsLoadingRemove(true);
-      await axiosInstance.delete(`/upload/files/${id}`, {
-        headers: {
-          Authorization: `Bearer ${cookieServices.get("jwt")}`,
-        },
-      });
-      setHiddenImageIds((prevIds) => [...prevIds, id]);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoadingRemove(false);
-    }
-  };
-
+  // Renders
   const renderBody = () => {
     if (Array.isArray(data) && data.length > 0) {
       return data.map((item, index) => (
@@ -423,6 +505,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
               value={dataProduct?.attributes.title}
               onChange={onChangeTextHandler}
             />
+            {isTitle && (
+              <FormHelperText color={"red.400"}>
+                Title is required!
+              </FormHelperText>
+            )}
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Description</FormLabel>
@@ -432,6 +519,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
               value={dataProduct?.attributes.description}
               onChange={onChangeTextHandler}
             />
+            {isDescription && (
+              <FormHelperText color={"red.400"}>
+                Description is required!
+              </FormHelperText>
+            )}
           </FormControl>
           {isProduct ? (
             <>
@@ -444,7 +536,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                   }
                 >
                   {dataProduct &&
-                    filteredCategory().map((item: ICategories, idx) => (
+                    categoriesData.map((item: ICategories, idx: number) => (
                       <option key={idx} value={item.attributes.title}>
                         {item.attributes.title}
                       </option>
@@ -460,6 +552,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                   value={dataProduct?.attributes.brand}
                   onChange={onChangeTextHandler}
                 />
+                {isBrand && (
+                  <FormHelperText color={"red.400"}>
+                    Brand is required!
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Stock</FormLabel>
@@ -469,6 +566,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                     placeholder="Stock"
                   />
                 </NumberInput>
+                {isStock && (
+                  <FormHelperText color={"red.400"}>
+                    Stock is required!
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Price</FormLabel>
@@ -486,6 +588,11 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                     <InputRightAddon>USD</InputRightAddon>
                   </InputGroup>
                 </NumberInput>
+                {isPrice && (
+                  <FormHelperText color={"red.400"}>
+                    Price is required!
+                  </FormHelperText>
+                )}
               </FormControl>
               <RadioGroup
                 defaultValue={
@@ -728,7 +835,8 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                 }
               }}
             />
-            {dataProduct?.attributes?.thumbnail && (
+            {(dataProduct?.attributes?.thumbnail.data?.attributes?.url ||
+              thumbnail) && (
               <Grid
                 mt={2}
                 gridTemplateColumns={`repeat(auto-fill, minmax(130px, 1fr))`}
