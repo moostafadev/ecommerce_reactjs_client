@@ -22,6 +22,8 @@ import DashboardTable from "../../components/DashboardTable";
 import ModalCustom from "../../components/ModalCustom";
 import { useState } from "react";
 import cookieServices from "../../services/cookieServices";
+import { useDispatch, useSelector } from "react-redux";
+import { generateUniqueTmp, selectTmpValue } from "../../app/features/tmpSlice";
 
 const CategoriesDashboardPage = () => {
   const defaultCategory = {
@@ -53,18 +55,20 @@ const CategoriesDashboardPage = () => {
     "Thumbnail",
     "Actions",
   ];
+  const tmpValue = useSelector(selectTmpValue);
 
   const getCategories = async () => {
     const res = await axiosInstance.get(`/categories?populate=*`);
     return res;
   };
   const { isLoading, data } = useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", tmpValue],
     queryFn: getCategories,
   });
   const categories: ICategory[] = data?.data?.data;
 
   const toast = useToast();
+  const dispatch = useDispatch();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [dataCategory, setDataCategory] = useState<ICategory>(defaultCategory);
@@ -129,15 +133,13 @@ const CategoriesDashboardPage = () => {
       });
       setDataCategory(defaultCategory);
       onClose();
+      dispatch(generateUniqueTmp());
       toast({
         title: "Added Successful",
         status: "success",
         duration: 500,
         isClosable: true,
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
     } catch (error) {
       console.log(error);
     } finally {
@@ -154,7 +156,11 @@ const CategoriesDashboardPage = () => {
           Add a new category
         </Button>
       </Flex>
-      <DashboardTable data={categories} tHeadData={headTable} />
+      <DashboardTable
+        data={categories}
+        tHeadData={headTable}
+        categoriesData={categories}
+      />
       <ModalCustom
         isOpen={isOpen}
         onClose={onClose}

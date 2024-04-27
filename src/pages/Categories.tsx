@@ -5,8 +5,12 @@ import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import MainCard from "../components/MainCard";
 import MainCardSkeleton from "../components/MainCardSkeleton";
 import { axiosInstance } from "../api/axios.config";
+import { useSelector } from "react-redux";
+import { selectTmpValue } from "../app/features/tmpSlice";
 
 const CategoriesPage = () => {
+  const tmpValue = useSelector(selectTmpValue);
+
   const getCategories = async () => {
     const res = await axiosInstance.get(`/categories?populate=*`);
     return res;
@@ -16,7 +20,7 @@ const CategoriesPage = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", tmpValue],
     queryFn: getCategories,
   });
 

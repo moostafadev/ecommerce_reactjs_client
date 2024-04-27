@@ -83,9 +83,12 @@ export interface IUserData {
   email: string;
   createdAt: string;
   role: {
+    id: number;
     name: string;
+    type: string;
   };
   image: {
     url: string;
+    alternativeText: string;
   };
 }

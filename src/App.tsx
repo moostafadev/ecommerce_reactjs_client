@@ -20,7 +20,7 @@ function App() {
   const admin: string = cookieServices.get("user")?.role?.name;
 
   const auth = () => {
-    if (admin === "admin") {
+    if (admin === "Admin") {
       return true;
     }
     return false;

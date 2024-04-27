@@ -5,14 +5,18 @@ import { MAX_WIDTH_CONTAINER } from "../common/varables";
 import MainCard from "../components/MainCard";
 import MainCardSkeleton from "../components/MainCardSkeleton";
 import { axiosInstance } from "../api/axios.config";
+import { selectTmpValue } from "../app/features/tmpSlice";
+import { useSelector } from "react-redux";
 
 const ProductsPage = () => {
+  const tmpValue = useSelector(selectTmpValue);
+
   const getProducts = async () => {
     const res = await axiosInstance.get(`/products?populate=*`);
     return res;
   };
   const { isLoading, data, error } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", tmpValue],
     queryFn: getProducts,
   });
 

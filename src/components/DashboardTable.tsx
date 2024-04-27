@@ -36,15 +36,22 @@ import { axiosInstance } from "../api/axios.config";
 import { useEffect, useState } from "react";
 import cookieServices from "../services/cookieServices";
 import ModalCustom from "./ModalCustom";
-import { useQuery } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { generateUniqueTmp } from "../app/features/tmpSlice";
 
 interface IProps {
   tHeadData: string[];
   data: (ICategory | IProduct)[];
   isProduct?: boolean;
+  categoriesData: ICategory[];
 }
 
-const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
+const DashboardTable = ({
+  data,
+  tHeadData,
+  isProduct,
+  categoriesData,
+}: IProps) => {
   const defaultProduct = {
     id: 0,
     attributes: {
@@ -104,17 +111,8 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
     },
   };
 
-  const getCategories = async () => {
-    const res = await axiosInstance.get(`/categories?populate=*`);
-    return res;
-  };
-  const { data: dataCategories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-  });
-  const categoriesData: ICategory[] = dataCategories?.data?.data;
-
   const toast = useToast();
+  const dispatch = useDispatch();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -257,15 +255,13 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
         setDataProduct(defaultProduct);
         setDataCategory(defaultCategory);
         onClose();
+        dispatch(generateUniqueTmp());
         toast({
           title: "Deleted Successful",
           status: "success",
           duration: 1000,
           isClosable: true,
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       } catch (error) {
         console.log(error);
       } finally {
@@ -311,7 +307,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
       }
     }
     const formData = new FormData();
-    if (dataProduct) {
+    if (dataProduct.id || dataCategory.id) {
       setIsLoading(true);
       if (isProduct) {
         formData.append(
@@ -356,16 +352,15 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
           }
         );
         setDataProduct(defaultProduct);
+        setDataCategory(defaultCategory);
         onModalClose();
+        dispatch(generateUniqueTmp());
         toast({
           title: "Edit Successful",
           status: "success",
           duration: 500,
           isClosable: true,
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
       } catch (error) {
         console.log(error);
       } finally {
@@ -577,7 +572,7 @@ const DashboardTable = ({ data, tHeadData, isProduct }: IProps) => {
                   }
                 >
                   {dataProduct &&
-                    categoriesData.map((item: ICategories, idx: number) => (
+                    categoriesData?.map((item: ICategories, idx: number) => (
                       <option key={idx} value={item.attributes.title}>
                         {item.attributes.title}
                       </option>

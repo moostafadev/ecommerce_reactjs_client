@@ -5,9 +5,13 @@ import {
   Box,
   Button,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
   Grid,
   Heading,
   Image,
+  Select,
   Text,
   useColorMode,
   useDisclosure,
@@ -18,9 +22,38 @@ import { FaRegEdit, FaRegEye, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import AlertDialogC from "../../components/AlartDialog";
+import ModalCustom from "../../components/ModalCustom";
+import { useDispatch, useSelector } from "react-redux";
+import { generateUniqueTmp, selectTmpValue } from "../../app/features/tmpSlice";
 
 const UsersDashboardPage = () => {
+  const defaultUser = {
+    id: 0,
+    createdAt: "",
+    email: "",
+    role: {
+      id: 0,
+      name: "",
+      type: "",
+    },
+    image: {
+      url: "",
+      alternativeText: "",
+    },
+    username: "",
+  };
+  const tmpValue = useSelector(selectTmpValue);
+
+  const toast = useToast();
+  const dispatch = useDispatch();
   const { colorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
+
   const getUsers = async () => {
     const res = await axiosInstance.get(`/users?populate=*`, {
       headers: {
@@ -30,39 +63,103 @@ const UsersDashboardPage = () => {
     return res;
   };
   const { isLoading, data } = useQuery({
-    queryKey: ["usersData"],
+    queryKey: ["usersData", tmpValue],
     queryFn: getUsers,
   });
+
+  const getRoles = async () => {
+    const res = await axiosInstance.get(`/users-permissions/roles?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${cookieServices.get("jwt")}`,
+      },
+    });
+    return res;
+  };
+  const { data: dataRoles } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getRoles,
+  });
+  const rolesData = dataRoles?.data?.roles;
 
   const users: IUserData[] = data?.data?.filter(
     (user: IUserData) => user.id !== cookieServices.get("user").id
   );
 
-  const [id, setId] = useState<number | null>(null);
+  const [userData, setUserData] = useState<IUserData>(defaultUser);
   const [isLoadingDel, setIsLoadingDel] = useState(false);
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoadingBtn, setIsLoadingBtn] = useState(false);
+  // Validation
+  const [isRole, setIsRole] = useState(false);
+
+  const onChangeCategoryHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    console.log(value);
+
+    if (userData) {
+      setUserData({
+        ...userData,
+        role: {
+          ...userData.role,
+          id: +value,
+        },
+      });
+    }
+  };
+
+  const onSubmitEditHandler = async () => {
+    // Valication
+    const { name } = userData.role;
+    if (!name) {
+      setIsRole(true);
+      return;
+    }
+    setIsLoadingBtn(true);
+    try {
+      await axiosInstance.put(
+        `/users/${userData.id}`,
+        {
+          role: userData.role.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${cookieServices.get("jwt")}`,
+          },
+        }
+      );
+      setUserData(defaultUser);
+      onModalClose();
+      dispatch(generateUniqueTmp());
+      toast({
+        title: "Edit Successful",
+        status: "success",
+        duration: 500,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingBtn(false);
+    }
+  };
 
   const onDelete = async () => {
-    if (id) {
+    if (userData.id) {
       setIsLoadingDel(true);
       try {
-        await axiosInstance.delete(`/users/${id}`, {
+        await axiosInstance.delete(`/users/${userData.id}`, {
           headers: {
             Authorization: `Bearer ${cookieServices.get("jwt")}`,
           },
         });
-        setId(null);
+        setUserData(defaultUser);
         onClose();
+        dispatch(generateUniqueTmp());
         toast({
           title: "Deleted Successful",
           status: "success",
           duration: 1000,
           isClosable: true,
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       } catch (error) {
         console.log(error);
       } finally {
@@ -126,7 +223,15 @@ const UsersDashboardPage = () => {
                     >
                       <FaRegEye />
                     </Button>
-                    <Button colorScheme="blue" size={"sm"} flexGrow={1}>
+                    <Button
+                      colorScheme="blue"
+                      size={"sm"}
+                      flexGrow={1}
+                      onClick={() => {
+                        setUserData(user);
+                        onModalOpen();
+                      }}
+                    >
                       <FaRegEdit />
                     </Button>
                     <Button
@@ -134,7 +239,7 @@ const UsersDashboardPage = () => {
                       size={"sm"}
                       flexGrow={1}
                       onClick={() => {
-                        setId(user.id);
+                        setUserData(user);
                         onOpen();
                       }}
                     >
@@ -156,6 +261,39 @@ const UsersDashboardPage = () => {
         isLoading={isLoadingDel}
         title={"Delete user"}
       />
+      <ModalCustom
+        isOpen={isModalOpen}
+        onClose={onModalClose}
+        title="Edit user"
+        clickHandler={onSubmitEditHandler}
+        isLoading={isLoadingBtn}
+      >
+        <Box>
+          <FormControl mt={4}>
+            <FormLabel>Role</FormLabel>
+            <Select
+              placeholder="Choose role"
+              onChange={onChangeCategoryHandler}
+              value={userData?.role.id}
+            >
+              {userData &&
+                rolesData?.map(
+                  (
+                    item: { id: number; name: string; type: string },
+                    idx: number
+                  ) => (
+                    <option key={idx} value={item.id}>
+                      {item.name}
+                    </option>
+                  )
+                )}
+            </Select>
+            {isRole && (
+              <FormHelperText color={"red.400"}>Choose a role!</FormHelperText>
+            )}
+          </FormControl>
+        </Box>
+      </ModalCustom>
     </>
   );
 };

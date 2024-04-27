@@ -46,7 +46,7 @@ interface Props {
 const user = cookieServices.get("user");
 
 const Links = () => {
-  if (user?.role?.name === "admin") {
+  if (user?.role?.name === "Admin") {
     return [
       {
         name: "Dashboard",

@@ -30,6 +30,8 @@ import DashboardTable from "../../components/DashboardTable";
 import ModalCustom from "../../components/ModalCustom";
 import { useState } from "react";
 import cookieServices from "../../services/cookieServices";
+import { useDispatch, useSelector } from "react-redux";
+import { generateUniqueTmp, selectTmpValue } from "../../app/features/tmpSlice";
 
 const ProductsDashboardPage = () => {
   const defaultProduct = {
@@ -81,13 +83,14 @@ const ProductsDashboardPage = () => {
     "Thumbnail",
     "Actions",
   ];
+  const tmpValue = useSelector(selectTmpValue);
 
   const getProducts = async () => {
     const res = await axiosInstance.get(`/products?populate=*`);
     return res;
   };
   const { isLoading, data } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", tmpValue],
     queryFn: getProducts,
   });
   const products: IProduct[] = data?.data?.data;
@@ -103,6 +106,7 @@ const ProductsDashboardPage = () => {
   const categoriesData: ICategory[] = dataCategories?.data?.data;
 
   const toast = useToast();
+  const dispatch = useDispatch();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [dataProduct, setDataProduct] = useState<IProduct>(defaultProduct);
@@ -244,15 +248,13 @@ const ProductsDashboardPage = () => {
       });
       setDataProduct(defaultProduct);
       onClose();
+      dispatch(generateUniqueTmp());
       toast({
         title: "Added Successful",
         status: "success",
         duration: 500,
         isClosable: true,
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
     } catch (error) {
       console.log(error);
     } finally {
@@ -269,7 +271,12 @@ const ProductsDashboardPage = () => {
           Add a new product
         </Button>
       </Flex>
-      <DashboardTable data={products} tHeadData={headTable} isProduct={true} />
+      <DashboardTable
+        data={products}
+        tHeadData={headTable}
+        isProduct={true}
+        categoriesData={categoriesData}
+      />
       <ModalCustom
         isOpen={isOpen}
         onClose={onClose}

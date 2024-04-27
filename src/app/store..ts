@@ -3,6 +3,7 @@ import cartSlice from "./features/cartSlice";
 import globalSlice from "./features/globalSlice";
 import storage from "redux-persist/lib/storage";
 import { persistStore, persistReducer } from "redux-persist";
+import tmpSlice from "./features/tmpSlice";
 
 const persistConfig = {
   key: "cart",
@@ -13,6 +14,7 @@ const persistedCart = persistReducer(persistConfig, cartSlice);
 
 export const store = configureStore({
   reducer: {
+    tmp: tmpSlice,
     cart: persistedCart,
     global: globalSlice,
   },
