@@ -11,20 +11,25 @@ import {
   Grid,
   Heading,
   Image,
+  Input,
+  InputGroup,
+  InputRightElement,
   Select,
   Text,
   useColorMode,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IUserData } from "../../interfaces";
+import { IErrorResponse, IUser, IUserData } from "../../interfaces";
 import { FaRegEdit, FaRegEye, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import AlertDialogC from "../../components/AlartDialog";
 import ModalCustom from "../../components/ModalCustom";
 import { useDispatch, useSelector } from "react-redux";
 import { generateUniqueTmp, selectTmpValue } from "../../app/features/tmpSlice";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { AxiosError } from "axios";
 
 const UsersDashboardPage = () => {
   const defaultUser = {
@@ -42,12 +47,27 @@ const UsersDashboardPage = () => {
     },
     username: "",
   };
+  const dafaultAddUser = {
+    username: "",
+    email: "",
+    password: "",
+    role: {
+      id: 0,
+      name: "",
+      type: "",
+    },
+  };
   const tmpValue = useSelector(selectTmpValue);
 
   const toast = useToast();
   const dispatch = useDispatch();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isModalAddOpen,
+    onOpen: onModalAddOpen,
+    onClose: onModalAddClose,
+  } = useDisclosure();
   const {
     isOpen: isModalOpen,
     onOpen: onModalOpen,
@@ -89,12 +109,20 @@ const UsersDashboardPage = () => {
   const [isLoadingDel, setIsLoadingDel] = useState(false);
   const [isLoadingBtn, setIsLoadingBtn] = useState(false);
   // Validation
+  const [isUsername, setIsUsername] = useState(false);
+  const [isEmail, setIsEmail] = useState(false);
+  const [isPassword, setIsPassword] = useState(false);
   const [isRole, setIsRole] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [user, setUser] = useState<IUser>(dafaultAddUser);
+
+  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>): void => {
+    const { value, name } = event.target;
+    setUser({ ...user, [name]: value });
+  };
 
   const onChangeCategoryHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    console.log(value);
-
     if (userData) {
       setUserData({
         ...userData,
@@ -103,6 +131,77 @@ const UsersDashboardPage = () => {
           id: +value,
         },
       });
+    }
+  };
+
+  const onSubmitAddHandler = async () => {
+    const { id } = userData.role;
+    const { username, email, password } = user;
+    if (!username && !email && !password && !id) {
+      setIsUsername(true);
+      setIsEmail(true);
+      setIsPassword(true);
+      setIsRole(true);
+      return;
+    }
+    if (!username || username.length < 3) {
+      setIsUsername(true);
+      return;
+    }
+    if (!email) {
+      setIsEmail(true);
+      return;
+    }
+    if (!password || password.length < 6) {
+      setIsPassword(true);
+      return;
+    }
+    if (!id) {
+      setIsRole(true);
+      return;
+    }
+    setIsUsername(false);
+    setIsEmail(false);
+    setIsPassword(false);
+    setIsRole(false);
+    setIsLoadingBtn(true);
+    try {
+      await axiosInstance.post(
+        "/users",
+        {
+          username: user.username,
+          email: user.email,
+          password: user.password,
+          role: userData.role.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${cookieServices.get("jwt")}`,
+          },
+        }
+      );
+      setUser(dafaultAddUser);
+      setUserData(defaultUser);
+      onModalAddClose();
+      dispatch(generateUniqueTmp());
+      toast({
+        title: "Added Successful",
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+    } catch (error) {
+      const errorObj = error as AxiosError<IErrorResponse>;
+      toast({
+        title: errorObj.response?.data.error.message,
+        description:
+          "Unable to log in. Please double-check your username, email and password and try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingBtn(false);
     }
   };
 
@@ -175,7 +274,12 @@ const UsersDashboardPage = () => {
   return (
     <>
       <Flex flexDir={"column"} gap={"30px"}>
-        <Heading>Manage users</Heading>
+        <Flex justifyContent={"space-between"} alignItems={"center"}>
+          <Heading>Manage users</Heading>
+          <Button colorScheme="green" onClick={onModalAddOpen}>
+            Add a new user
+          </Button>
+        </Flex>
         <Grid
           templateColumns={"repeat(auto-fill, minmax(250px, 1fr))"}
           gap={"3"}
@@ -261,6 +365,97 @@ const UsersDashboardPage = () => {
         isLoading={isLoadingDel}
         title={"Delete user"}
       />
+      <ModalCustom
+        isOpen={isModalAddOpen}
+        onClose={onModalAddClose}
+        title="Add user"
+        clickHandler={onSubmitAddHandler}
+        isLoading={isLoadingBtn}
+      >
+        <Box>
+          <FormControl>
+            <FormLabel>Username</FormLabel>
+            <Input
+              type="text"
+              value={user.username}
+              onChange={onChangeHandler}
+              name="username"
+              isInvalid={isUsername}
+            />
+            {isUsername && (
+              <FormHelperText color={"red.400"}>
+                Username is required and min letters 3!
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Email address</FormLabel>
+            <Input
+              type="email"
+              value={user.email}
+              onChange={onChangeHandler}
+              name="email"
+              isInvalid={isEmail}
+            />
+            {isEmail && (
+              <FormHelperText color={"red.400"}>
+                Email is required!
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Password</FormLabel>
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={user.password}
+                onChange={onChangeHandler}
+                name="password"
+                isInvalid={isPassword}
+              />
+              <InputRightElement h={"full"}>
+                <Button
+                  variant={"ghost"}
+                  onClick={() =>
+                    setShowPassword((showPassword) => !showPassword)
+                  }
+                >
+                  {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+            {isPassword && (
+              <FormHelperText color={"red.400"}>
+                Password is required and min letters 6!
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Role</FormLabel>
+            <Select
+              placeholder="Choose role"
+              onChange={onChangeCategoryHandler}
+              value={userData?.role.id}
+              isInvalid={isRole}
+            >
+              {userData &&
+                rolesData?.map(
+                  (
+                    item: { id: number; name: string; type: string },
+                    idx: number
+                  ) => (
+                    <option key={idx} value={item.id}>
+                      {item.name}
+                    </option>
+                  )
+                )}
+            </Select>
+            {isRole && (
+              <FormHelperText color={"red.400"}>Choose a role!</FormHelperText>
+            )}
+          </FormControl>
+        </Box>
+      </ModalCustom>
       <ModalCustom
         isOpen={isModalOpen}
         onClose={onModalClose}

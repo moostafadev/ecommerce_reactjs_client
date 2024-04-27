@@ -17,17 +17,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChangeEvent, useState } from "react";
-import { IUser } from "../interfaces";
+import { IErrorResponse, IUser } from "../interfaces";
 import { axiosInstance } from "../api/axios.config";
 import { AxiosError } from "axios";
 import cookieServices from "../services/cookieServices";
 import { Link } from "react-router-dom";
-
-interface IErrorResponse {
-  error: {
-    message?: string;
-  };
-}
 
 const RegisterPage = ({ isAuthantecated }: { isAuthantecated: string }) => {
   const { colorMode } = useColorMode();

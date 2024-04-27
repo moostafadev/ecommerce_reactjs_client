@@ -75,6 +75,11 @@ export interface IUser {
   identifier?: string;
   email?: string;
   password: string;
+  role?: {
+    id: number;
+    name: string;
+    type: string;
+  };
 }
 
 export interface IUserData {
@@ -90,5 +95,11 @@ export interface IUserData {
   image: {
     url: string;
     alternativeText: string;
+  };
+}
+
+export interface IErrorResponse {
+  error: {
+    message?: string;
   };
 }
