@@ -297,7 +297,7 @@ const UsersDashboardPage = () => {
                   src={
                     user?.image?.url
                       ? user?.image?.url
-                      : "../../../src/assets/User_not_found.jpg"
+                      : "https://res.cloudinary.com/dvtmqtcyl/image/upload/v1713358341/User_not_found_503f908e95.jpg"
                   }
                 />
                 <Flex p={"16px"} flexDir={"column"} gap={"16px"}>
